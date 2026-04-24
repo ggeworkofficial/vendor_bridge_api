@@ -1,42 +1,44 @@
 "use strict";
 
-const { on } = require("node:cluster");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("sellers", {
+    await queryInterface.createTable("receipts", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      user_id: {
+      order_id: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
-          model: "users",
+          model: "orders",
           key: "id",
         },
-      },
-      name: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      location: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-      },
-      contact: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
+      amount: {
+        type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
-        defaultValue: false,
+      },
+      payment_method: {
+        type: Sequelize.STRING(20),
+        allowNull: false,
+      },
+      account: {
+        type: Sequelize.STRING(255),
+      },
+      file_url: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
+      status: {
+        type: Sequelize.STRING(30),
+        allowNull: false,
+      },
+      note: {
+        type: Sequelize.TEXT,
       },
       created_at: {
         allowNull: false,
@@ -49,9 +51,16 @@ module.exports = {
         defaultValue: Sequelize.literal("NOW()"),
       },
     });
+
+    await queryInterface.addConstraint("receipts", {
+      fields: ["payment_method"],
+      type: "check",
+      where: Sequelize.literal("payment_method IN ('full','advance','cod')"),
+      name: "receipts_payment_method_check",
+    });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable("sellers");
+    await queryInterface.dropTable("receipts");
   },
 };

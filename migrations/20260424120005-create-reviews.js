@@ -1,42 +1,38 @@
 "use strict";
 
-const { on } = require("node:cluster");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("sellers", {
+    await queryInterface.createTable("reviews", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
+      product_id: {
+        type: Sequelize.UUID,
+        references: {
+          model: "inventory",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
       user_id: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
           model: "users",
           key: "id",
         },
-      },
-      name: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      location: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-      },
-      contact: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
+      rating: {
+        type: Sequelize.SMALLINT,
         allowNull: false,
-        defaultValue: false,
+      },
+      comment: {
+        type: Sequelize.TEXT,
       },
       created_at: {
         allowNull: false,
@@ -49,9 +45,16 @@ module.exports = {
         defaultValue: Sequelize.literal("NOW()"),
       },
     });
+
+    await queryInterface.addConstraint("reviews", {
+      fields: ["rating"],
+      type: "check",
+      where: Sequelize.literal("rating BETWEEN 1 AND 5"),
+      name: "reviews_rating_check",
+    });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable("sellers");
+    await queryInterface.dropTable("reviews");
   },
 };

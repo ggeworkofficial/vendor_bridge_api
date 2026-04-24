@@ -1,57 +1,59 @@
 "use strict";
 
-const { on } = require("node:cluster");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("sellers", {
+    await queryInterface.createTable("order_items", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      user_id: {
+      order_id: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
-          model: "users",
+          model: "orders",
           key: "id",
         },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
-      name: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
+      product_id: {
+        type: Sequelize.UUID,
+        references: {
+          model: "inventory",
+          key: "id",
+        },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      location: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-      },
-      contact: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
+      quantity: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: false,
+      },
+      price: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
       },
       created_at: {
-        allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
       updated_at: {
-        allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
     });
+
+    await queryInterface.addConstraint("order_items", {
+      fields: ["quantity"],
+      type: "check",
+      where: Sequelize.literal("quantity > 0"),
+      name: "order_items_quantity_check",
+    });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable("sellers");
+    await queryInterface.dropTable("order_items");
   },
 };
