@@ -20,6 +20,7 @@ module.exports = {
       },
       sender_type: {
         type: Sequelize.STRING(20),
+        allowNull: false,
       },
       sender_id: {
         type: Sequelize.UUID,
@@ -32,6 +33,13 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
+    });
+
+    await queryInterface.addConstraint("complaint_messages", {
+      fields: ["sender_type"],
+      type: "check",
+      where: Sequelize.literal("sender_type IN ('user','admin')"),
+      name: "complaint_messages_sender_type_check",
     });
   },
 

@@ -58,6 +58,13 @@ module.exports = {
       where: Sequelize.literal("payment_method IN ('full','advance','cod')"),
       name: "receipts_payment_method_check",
     });
+
+    await queryInterface.addConstraint("receipts", {
+        fields: ["status"],
+        type: "check",
+        where: Sequelize.literal("status IN ('pending_review','approved','rejected')"),
+        name: "receipts_status_check",
+    })
   },
 
   down: async (queryInterface) => {

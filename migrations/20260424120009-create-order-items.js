@@ -51,6 +51,12 @@ module.exports = {
       where: Sequelize.literal("quantity > 0"),
       name: "order_items_quantity_check",
     });
+
+    await queryInterface.addConstraint("order_items", {
+        fields: ["order_id", "product_id"],
+        type: "unique",
+        name: "order_items_order_id_product_id_unique"
+    });
   },
 
   down: async (queryInterface) => {
