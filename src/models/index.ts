@@ -5,5 +5,8 @@ import Setting from "./setting.model";
 import Seller from "./seller.model";
 import Cart from "./cart.model";
 import Complaint from "./complaint.model";
+import Inventory from "./inventory.model";
+import ProductImage from "./product-image.model";
+import Review from "./review.model";
 
-export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint };
+export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review };
