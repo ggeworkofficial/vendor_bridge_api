@@ -1,5 +1,6 @@
 // src/config/database.ts
 import { Sequelize } from "sequelize-typescript";
+import { Category, PaymentAccount, Setting, User } from "../models";
 
 class Postgres {
   private static instance: Sequelize;
@@ -16,7 +17,7 @@ class Postgres {
         password: process.env.DB_PASSWORD!,
         dialect: "postgres",
         logging: false,
-        models: [__dirname + "/../models"],
+        models: [User, Category, PaymentAccount, Setting],
       });
     }
 
