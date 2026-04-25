@@ -1,0 +1,97 @@
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  Default,
+  ForeignKey,
+  BelongsTo,
+  AllowNull,
+  CreatedAt,
+  UpdatedAt,
+} from "sequelize-typescript";
+import User from "./user.model";
+
+@Table({
+  tableName: "orders",
+  timestamps: true,
+  underscored: true,
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+})
+export default class Order extends Model<Order> {
+  @PrimaryKey
+  @Default(DataType.UUIDV4)
+  @Column({
+    type: DataType.UUID,
+  })
+  id!: string;
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+  })
+  user_id?: string;
+
+  @BelongsTo(() => User)
+  user?: User;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING(30),
+    validate: {
+      isIn: [["pending", "confirmed", "out_for_delivery", "delivered", "cancelled"]],
+    },
+  })
+  status!: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING(20),
+    validate: {
+      isIn: [["paid", "unpaid"]],
+    },
+  })
+  payment_status!: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.STRING(20),
+    validate: {
+      isIn: [["full", "advance", "cod"]],
+    },
+  })
+  payment_method!: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+  })
+  total_amount!: string;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.TEXT,
+  })
+  address!: string;
+
+  @Column({
+    type: DataType.DATE,
+  })
+  estimated_delivery?: Date;
+
+  @CreatedAt
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  created_at!: Date;
+
+  @UpdatedAt
+  @Column({
+    type: DataType.DATE,
+    defaultValue: DataType.NOW,
+  })
+  updated_at!: Date;
+}

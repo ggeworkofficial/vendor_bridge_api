@@ -8,5 +8,8 @@ import Complaint from "./complaint.model";
 import Inventory from "./inventory.model";
 import ProductImage from "./product-image.model";
 import Review from "./review.model";
+import CartItem from "./cart-item.model";
+import Order from "./order.model";
+import OrderItem from "./order-item.model";
 
-export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review };
+export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem };
