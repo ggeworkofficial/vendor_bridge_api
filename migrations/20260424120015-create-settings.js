@@ -1,50 +1,35 @@
 "use strict";
 
-const { on } = require("node:cluster");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("sellers", {
+    await queryInterface.createTable("settings", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      user_id: {
-        type: Sequelize.UUID,
-        references: {
-          model: "users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
-      },
-      name: {
+      key: {
         type: Sequelize.STRING(255),
-        allowNull: true,
-    
-      },
-      location: {
-        type: Sequelize.STRING(255),
-        allowNull: true,
-      },
-      contact: {
-        type: Sequelize.STRING(50),
-        allowNull: true,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
         allowNull: false,
+        unique: true,
+      },
+      value: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.TEXT,
+      },
+      is_public: {
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
       created_at: {
-        allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
       updated_at: {
-        allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
@@ -52,6 +37,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable("sellers");
+    await queryInterface.dropTable("settings");
   },
 };
