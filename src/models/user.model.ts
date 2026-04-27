@@ -9,7 +9,14 @@ import {
   Unique,
   CreatedAt,
   UpdatedAt,
+  HasOne,
+  HasMany,
 } from "sequelize-typescript";
+import Seller from "./seller.model";
+import Cart from "./cart.model";
+import Order from "./order.model";
+import Review from "./review.model";
+import Complaint from "./complaint.model";
 
 @Table({
   tableName: "users",
@@ -78,4 +85,19 @@ export default class User extends Model<User> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasOne(() => Seller)
+  seller?: Seller;
+
+  @HasOne(() => Cart)
+  cart?: Cart;
+
+  @HasMany(() => Order)
+  orders?: Order[];
+
+  @HasMany(() => Review)
+  reviews?: Review[];
+
+  @HasMany(() => Complaint)
+  complaints?: Complaint[];
 }

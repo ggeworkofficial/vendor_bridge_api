@@ -10,8 +10,10 @@ import {
   AllowNull,
   CreatedAt,
   UpdatedAt,
+  HasMany,
 } from "sequelize-typescript";
 import User from "./user.model";
+import Inventory from "./inventory.model";
 
 @Table({
   tableName: "sellers",
@@ -76,4 +78,7 @@ export default class Seller extends Model<Seller> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasMany(() => Inventory)
+  products?: Inventory[];
 }

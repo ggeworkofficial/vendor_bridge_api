@@ -10,8 +10,13 @@ import {
   AllowNull,
   CreatedAt,
   UpdatedAt,
+  HasMany,
 } from "sequelize-typescript";
 import User from "./user.model";
+import OrderItem from "./order-item.model";
+import Receipt from "./receipt.model";
+import Logistics from "./logistics.model";
+import Complaint from "./complaint.model";
 
 @Table({
   tableName: "orders",
@@ -94,4 +99,16 @@ export default class Order extends Model<Order> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasMany(() => OrderItem)
+  items?: OrderItem[];
+
+  @HasMany(() => Receipt)
+  receipts?: Receipt[];
+
+  @HasMany(() => Logistics)
+  logistics?: Logistics[];
+
+  @HasMany(() => Complaint)
+  complaints?: Complaint[];
 }

@@ -11,8 +11,10 @@ import {
   Unique,
   CreatedAt,
   UpdatedAt,
+  HasMany,
 } from "sequelize-typescript";
 import User from "./user.model";
+import CartItem from "./cart-item.model";
 
 @Table({
   tableName: "carts",
@@ -53,4 +55,9 @@ export default class Cart extends Model<Cart> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasMany(() => CartItem)
+  items?: CartItem[];
 }
+    
+

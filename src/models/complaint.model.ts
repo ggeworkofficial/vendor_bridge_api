@@ -10,8 +10,10 @@ import {
   AllowNull,
   CreatedAt,
   UpdatedAt,
+  HasMany,
 } from "sequelize-typescript";
 import User from "./user.model";
+import ComplaintMessage from "./complaint-message.model";
 
 @Table({
   tableName: "complaints",
@@ -87,4 +89,7 @@ export default class Complaint extends Model<Complaint> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasMany(() => ComplaintMessage)
+  messages?: ComplaintMessage[];
 }

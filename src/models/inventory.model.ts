@@ -14,6 +14,10 @@ import {
 } from "sequelize-typescript";
 import Category from "./category.model";
 import Seller from "./seller.model";
+import ProductImage from "./product-image.model";
+import Review from "./review.model";
+import CartItem from "./cart-item.model";
+import OrderItem from "./order-item.model";
 
 @Table({
   tableName: "inventory",
@@ -97,4 +101,17 @@ export default class Inventory extends Model<Inventory> {
     defaultValue: DataType.NOW,
   })
   updated_at!: Date;
+
+  @HasMany(() => ProductImage)
+  images?: ProductImage[];
+
+  @HasMany(() => Review)
+  reviews?: Review[];
+
+  @HasMany(() => CartItem)
+  cartItems?: CartItem[];
+
+  @HasMany(() => OrderItem)
+  orderItems?: OrderItem[];
+
 }
