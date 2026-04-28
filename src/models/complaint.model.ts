@@ -14,6 +14,7 @@ import {
 } from "sequelize-typescript";
 import User from "./user.model";
 import ComplaintMessage from "./complaint-message.model";
+import Order from "./order.model";
 
 @Table({
   tableName: "complaints",
@@ -37,14 +38,17 @@ export default class Complaint extends Model<Complaint> {
   })
   user_id?: string;
 
-  @BelongsTo(() => User)
+   @BelongsTo(() => User)
   user?: User;
 
+  @ForeignKey(() => Order)
   @AllowNull(true)
   @Column({
     type: DataType.UUID,
   })
   order_id?: string;
+  @BelongsTo(() => Order)
+  order?: Order;
 
   @AllowNull(false)
   @Column({
