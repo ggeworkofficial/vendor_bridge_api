@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler';
 import Postgres from './connection/postgres';
 import './connection/redis';
+import authRoutes from './routes/auth.routes';
 
 
 dotenv.config();
@@ -22,6 +23,8 @@ dotenv.config();
     app.get("/", (req: express.Request, res: express.Response) => {
         res.send("API running");
     });
+
+    app.use('/api/auth', authRoutes);
 
     app.use(errorHandler);
 
