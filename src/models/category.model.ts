@@ -10,7 +10,17 @@ import {
   UpdatedAt,
   HasMany,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Inventory from "./inventory.model";
+
+interface CategoryAttributes {
+  id: string;
+  name: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface CategoryCreationAttributes extends Optional<CategoryAttributes, "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "categories",
@@ -19,9 +29,8 @@ import Inventory from "./inventory.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Category extends Model<Category> {
+export default class Category extends Model<CategoryAttributes, CategoryCreationAttributes> implements CategoryAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

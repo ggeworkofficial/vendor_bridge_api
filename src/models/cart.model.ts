@@ -13,8 +13,18 @@ import {
   UpdatedAt,
   HasMany,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import User from "./user.model";
 import CartItem from "./cart-item.model";
+
+interface CartAttributes {
+  id: string;
+  user_id: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface CartCreationAttributes extends Optional<CartAttributes, "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "carts",
@@ -23,9 +33,8 @@ import CartItem from "./cart-item.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Cart extends Model<Cart> {
+export default class Cart extends Model<CartAttributes, CartCreationAttributes> implements CartAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

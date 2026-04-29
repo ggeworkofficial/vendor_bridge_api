@@ -17,7 +17,7 @@ export const findUserByEmail = async (email: string) => {
 };
 
 export const createUser = async (payload: CreateUserPayload) => {
-  return User.create(payload as any);
+  return User.create(payload);
 };
 
 export const createSession = async (sessionId: string, userId: string, lastActive: Date) => {

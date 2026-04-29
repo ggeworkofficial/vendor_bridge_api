@@ -17,6 +17,24 @@ import Cart from "./cart.model";
 import Order from "./order.model";
 import Review from "./review.model";
 import Complaint from "./complaint.model";
+import { Optional } from "sequelize";
+
+interface UserAttributes {
+  id: string;
+  full_name: string;
+  email: string;
+  password: string;
+  role: string;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface UserCreationAttributes
+  extends Optional<
+    UserAttributes,
+     "role" | "status" | "created_at" | "updated_at"
+  > {}
 
 @Table({
   tableName: "users",
@@ -25,9 +43,9 @@ import Complaint from "./complaint.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class User extends Model<User> {
+export default class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
+  @AllowNull(false)
   @Column({
     type: DataType.UUID,
   })

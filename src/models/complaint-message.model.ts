@@ -10,7 +10,19 @@ import {
   AllowNull,
   CreatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Complaint from "./complaint.model";
+
+interface ComplaintMessageAttributes {
+  id: string;
+  complaint_id?: string;
+  sender_type: string;
+  sender_id?: string;
+  message: string;
+  created_at?: Date;
+}
+
+interface ComplaintMessageCreationAttributes extends Optional<ComplaintMessageAttributes, "sender_id" | "created_at"> {}
 
 @Table({
   tableName: "complaint_messages",
@@ -19,9 +31,8 @@ import Complaint from "./complaint.model";
   createdAt: "created_at",
   updatedAt: false,
 })
-export default class ComplaintMessage extends Model<ComplaintMessage> {
+export default class ComplaintMessage extends Model<ComplaintMessageAttributes, ComplaintMessageCreationAttributes> implements ComplaintMessageAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })
