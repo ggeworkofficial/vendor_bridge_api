@@ -10,6 +10,19 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
+
+interface SettingAttributes {
+  id: string;
+  key: string;
+  value: object;
+  description?: string;
+  is_public?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface SettingCreationAttributes extends Optional<SettingAttributes, "description" | "is_public" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "settings",
@@ -18,9 +31,8 @@ import {
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Setting extends Model<Setting> {
+export default class Setting extends Model<SettingAttributes, SettingCreationAttributes> implements SettingAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

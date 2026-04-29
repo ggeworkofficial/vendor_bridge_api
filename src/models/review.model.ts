@@ -11,8 +11,21 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Inventory from "./inventory.model";
 import User from "./user.model";
+
+interface ReviewAttributes {
+  id: string;
+  product_id?: string;
+  user_id?: string;
+  rating: number;
+  comment?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface ReviewCreationAttributes extends Optional<ReviewAttributes, "comment" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "reviews",
@@ -21,9 +34,8 @@ import User from "./user.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Review extends Model<Review> {
+export default class Review extends Model<ReviewAttributes, ReviewCreationAttributes> implements ReviewAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

@@ -12,8 +12,22 @@ import {
   UpdatedAt,
   HasMany,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import User from "./user.model";
 import Inventory from "./inventory.model";
+
+interface SellerAttributes {
+  id: string;
+  user_id?: string;
+  name?: string;
+  location?: string;
+  contact?: string;
+  verified?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface SellerCreationAttributes extends Optional<SellerAttributes, "name" | "location" | "contact" | "verified" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "sellers",
@@ -22,9 +36,8 @@ import Inventory from "./inventory.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Seller extends Model<Seller> {
+export default class Seller extends Model<SellerAttributes, SellerCreationAttributes> implements SellerAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

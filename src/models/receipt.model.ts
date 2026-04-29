@@ -11,7 +11,23 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Order from "./order.model";
+
+interface ReceiptAttributes {
+  id: string;
+  order_id?: string;
+  amount: string;
+  payment_method: string;
+  account?: string;
+  file_url: string;
+  status: string;
+  note?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface ReceiptCreationAttributes extends Optional<ReceiptAttributes, "note" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "receipts",
@@ -20,9 +36,8 @@ import Order from "./order.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Receipt extends Model<Receipt> {
+export default class Receipt extends Model<ReceiptAttributes, ReceiptCreationAttributes> implements ReceiptAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })
@@ -53,10 +68,11 @@ export default class Receipt extends Model<Receipt> {
   })
   payment_method!: string;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING(255),
   })
-  account?: string;
+  account!: string;
 
   @AllowNull(false)
   @Column({

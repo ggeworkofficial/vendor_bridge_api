@@ -11,7 +11,18 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Inventory from "./inventory.model";
+
+interface ProductImageAttributes {
+  id: string;
+  product_id?: string;
+  image_url: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface ProductImageCreationAttributes extends Optional<ProductImageAttributes, "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "product_images",
@@ -20,9 +31,8 @@ import Inventory from "./inventory.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class ProductImage extends Model<ProductImage> {
+export default class ProductImage extends Model<ProductImageAttributes, ProductImageCreationAttributes> implements ProductImageAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

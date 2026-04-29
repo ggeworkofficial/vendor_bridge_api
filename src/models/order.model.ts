@@ -12,11 +12,27 @@ import {
   UpdatedAt,
   HasMany,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import User from "./user.model";
 import OrderItem from "./order-item.model";
 import Receipt from "./receipt.model";
 import Logistics from "./logistics.model";
 import Complaint from "./complaint.model";
+
+interface OrderAttributes {
+  id: string;
+  user_id?: string;
+  status: string;
+  payment_status: string;
+  payment_method: string;
+  total_amount: string;
+  address: string;
+  estimated_delivery?: Date;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface OrderCreationAttributes extends Optional<OrderAttributes, "estimated_delivery" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "orders",
@@ -25,9 +41,8 @@ import Complaint from "./complaint.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Order extends Model<Order> {
+export default class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

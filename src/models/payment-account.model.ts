@@ -10,6 +10,20 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
+
+interface PaymentAccountAttributes {
+  id: string;
+  type: string;
+  label: string;
+  account_name: string;
+  account_number: string;
+  details?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface PaymentAccountCreationAttributes extends Optional<PaymentAccountAttributes, "details" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "payment_accounts",
@@ -18,9 +32,8 @@ import {
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class PaymentAccount extends Model<PaymentAccount> {
+export default class PaymentAccount extends Model<PaymentAccountAttributes, PaymentAccountCreationAttributes> implements PaymentAccountAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })
