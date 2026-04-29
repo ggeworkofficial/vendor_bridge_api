@@ -12,9 +12,24 @@ import {
   UpdatedAt,
   HasMany,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import User from "./user.model";
 import ComplaintMessage from "./complaint-message.model";
 import Order from "./order.model";
+
+interface ComplaintAttributes {
+  id: string;
+  user_id?: string;
+  order_id?: string;
+  subject: string;
+  description: string;
+  status: string;
+  priority: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface ComplaintCreationAttributes extends Optional<ComplaintAttributes, "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "complaints",
@@ -23,9 +38,8 @@ import Order from "./order.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Complaint extends Model<Complaint> {
+export default class Complaint extends Model<ComplaintAttributes, ComplaintCreationAttributes> implements ComplaintAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

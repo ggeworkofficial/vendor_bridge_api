@@ -12,7 +12,23 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Order from "./order.model";
+
+interface LogisticsAttributes {
+  id: string;
+  order_id: string;
+  carrier: string;
+  tracking_number: string;
+  status: string;
+  origin: string;
+  destination: string;
+  estimated_eta?: Date;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface LogisticsCreationAttributes extends Optional<LogisticsAttributes, "estimated_eta" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "logistics",
@@ -21,9 +37,8 @@ import Order from "./order.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Logistics extends Model<Logistics> {
+export default class Logistics extends Model<LogisticsAttributes, LogisticsCreationAttributes> implements LogisticsAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

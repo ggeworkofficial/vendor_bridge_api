@@ -12,12 +12,29 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Category from "./category.model";
 import Seller from "./seller.model";
 import ProductImage from "./product-image.model";
 import Review from "./review.model";
 import CartItem from "./cart-item.model";
 import OrderItem from "./order-item.model";
+
+interface InventoryAttributes {
+  id: string;
+  name: string;
+  description?: string;
+  price: string;
+  quality_label?: string;
+  verified?: boolean;
+  category_id?: string;
+  seller_id?: string;
+  location?: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface InventoryCreationAttributes extends Optional<InventoryAttributes, "description"  | "verified" | "location" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "inventory",
@@ -26,9 +43,8 @@ import OrderItem from "./order-item.model";
   createdAt: "created_at",
   updatedAt: "updated_at",
 })
-export default class Inventory extends Model<Inventory> {
+export default class Inventory extends Model<InventoryAttributes, InventoryCreationAttributes> implements InventoryAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })

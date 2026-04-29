@@ -11,8 +11,21 @@ import {
   CreatedAt,
   UpdatedAt,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import Order from "./order.model";
 import Inventory from "./inventory.model";
+
+interface OrderItemAttributes {
+  id: string;
+  order_id?: string;
+  product_id?: string;
+  quantity: number;
+  price: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface OrderItemCreationAttributes extends Optional<OrderItemAttributes, "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "order_items",
@@ -28,9 +41,8 @@ import Inventory from "./inventory.model";
     },
   ],
 })
-export default class OrderItem extends Model<OrderItem> {
+export default class OrderItem extends Model<OrderItemAttributes, OrderItemCreationAttributes> implements OrderItemAttributes {
   @PrimaryKey
-  @Default(DataType.UUIDV4)
   @Column({
     type: DataType.UUID,
   })
