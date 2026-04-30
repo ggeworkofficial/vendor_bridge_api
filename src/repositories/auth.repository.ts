@@ -48,3 +48,7 @@ export const updateSession = async (sessionId: string, userId: string, lastActiv
   await redis.set(sessionId, payload, "EX", SESSION_TTL);
   return { sessionId, lastActive };
 };
+
+export const removeSession = async (sessionId: string) => {
+  await redis.del(sessionId);
+};

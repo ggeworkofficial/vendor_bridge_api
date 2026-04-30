@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById } from "../repositories/auth.repository";
+import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession } from "../repositories/auth.repository";
 import { User } from "../models";
 import { createError } from "../helpers/error";
 
@@ -99,6 +99,10 @@ class AuthService {
 
   async updateSession(sessionId: string, userId: string, lastActive: Date) {
     await updateSession(sessionId, userId, lastActive);
+  }
+
+  async logout(sessionId: string) {
+    await removeSession(sessionId);
   }
 }
 

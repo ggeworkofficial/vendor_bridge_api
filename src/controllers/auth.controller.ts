@@ -36,3 +36,16 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 };
+
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sessionId = req.cookies?.session_id;
+    if (!sessionId) return res.status(200).json({ message: "Already logged out" });
+    await AuthService.logout(sessionId);
+    res.clearCookie("session_id");
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
