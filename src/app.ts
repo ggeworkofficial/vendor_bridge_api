@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import http from 'http';
 import dotenv from 'dotenv';
@@ -7,20 +8,38 @@ import { errorHandler } from './middleware/errorHandler';
 import Postgres from './connection/postgres';
 import './connection/redis';
 import authRoutes from './routes/auth.routes';
+import { authenticate } from './middleware/authenticator';
 
 
 dotenv.config();
 
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: {
+      id: string;
+      role?: string;
+    };
+    session?: {
+      id: string;
+      last_active?: Date;
+    };
+  }
+}
+
  async function start() {
     const app = express();
 
-    app.use(cors());
+    app.use(cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    }));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
     await Postgres.connect();
 
     //routes here
-    app.get("/", (req: express.Request, res: express.Response) => {
+    app.get("/api/test", authenticate, (req: express.Request, res: express.Response) => {
         res.send("API running");
     });
 

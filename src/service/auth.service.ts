@@ -1,8 +1,9 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { createUser, createSession, findUserByEmail } from "../repositories/auth.repository";
+import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById } from "../repositories/auth.repository";
 import { User } from "../models";
 import { createError } from "../helpers/error";
+
 
 interface RegisterPayload {
   full_name: string;
@@ -25,6 +26,12 @@ interface AuthResult {
   updated_at: Date;
   session_id?: string;
   last_active?: Date;
+}
+
+interface SessionReuslt {
+  user_id: string;
+  last_active: Date;
+  ttl: number
 }
 
 
@@ -72,6 +79,26 @@ class AuthService {
       session_id: sessionId,
       last_active: lastActive,
     };
+  }
+
+  async validateSession(sessionId: string): Promise<SessionReuslt> {
+    const session = await getSession(sessionId);
+    if (!session) throw createError("Invalid session", 401);
+
+    if (session.ttl <= 0) throw createError("Session expired", 401);
+
+    const user = await findUserById(session.user_id);
+    if (!user) throw createError("User not found", 401);
+
+    return {
+      user_id: session.user_id,
+      last_active: session.last_active,
+      ttl: session.ttl
+    };
+  }
+
+  async updateSession(sessionId: string, userId: string, lastActive: Date) {
+    await updateSession(sessionId, userId, lastActive);
   }
 }
 
