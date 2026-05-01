@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createError } from "../helpers/error";
 import authService from "../service/auth.service";
 import { setSessionCookie } from "../helpers/auth";
+import { Role } from "./roleChecker";
 
 const SESSION_THRESHOLD = 3 * 24 * 60 * 60; // 3 days in seconds
 
@@ -18,7 +19,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
             setSessionCookie(res, sessionId);
         }
 
-        req.user = { id: session.user_id };
+        req.user = { id: session.user_id, role: session.role as Role };
         req.session = {
             id: sessionId,
             last_active: session.last_active,

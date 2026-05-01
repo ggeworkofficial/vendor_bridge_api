@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession } from "../repositories/auth.repository";
+import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession, getUserRole } from "../repositories/auth.repository";
 import { User } from "../models";
 import { createError } from "../helpers/error";
 
@@ -31,7 +31,8 @@ interface AuthResult {
 interface SessionReuslt {
   user_id: string;
   last_active: Date;
-  ttl: number
+  ttl: number;
+  role: string;
 }
 
 
@@ -87,13 +88,14 @@ class AuthService {
 
     if (session.ttl <= 0) throw createError("Session expired", 401);
 
-    const user = await findUserById(session.user_id);
-    if (!user) throw createError("User not found", 401);
+    const role = await getUserRole(session.user_id);
+    if (!role) throw createError("User not found", 401);
 
     return {
       user_id: session.user_id,
       last_active: session.last_active,
-      ttl: session.ttl
+      ttl: session.ttl,
+      role: role
     };
   }
 

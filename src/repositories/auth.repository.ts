@@ -24,6 +24,11 @@ export const createUser = async (payload: CreateUserPayload) => {
   return User.create(payload);
 };
 
+export const getUserRole = async (userId: string) => {
+  const user = await findUserById(userId);
+  return user?.role || null;
+}
+
 export const createSession = async (sessionId: string, userId: string, lastActive: Date) => {
   const payload = JSON.stringify({ user_id: userId, last_active: lastActive.toISOString() });
   await redis.set(sessionId, payload, "EX", SESSION_TTL);

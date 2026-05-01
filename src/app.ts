@@ -9,6 +9,7 @@ import Postgres from './connection/postgres';
 import './connection/redis';
 import authRoutes from './routes/auth.routes';
 import { authenticate } from './middleware/authenticator';
+import { checkRole, Role } from './middleware/roleChecker';
 
 
 dotenv.config();
@@ -17,7 +18,7 @@ declare module "express-serve-static-core" {
   interface Request {
     user?: {
       id: string;
-      role?: string;
+      role?: Role;
     };
     session?: {
       id: string;
@@ -39,7 +40,7 @@ declare module "express-serve-static-core" {
     await Postgres.connect();
 
     //routes here
-    app.get("/api/test", authenticate, (req: express.Request, res: express.Response) => {
+    app.get("/api/test", authenticate, checkRole("admin"), (req: express.Request, res: express.Response) => {
         res.send("API running");
     });
 
