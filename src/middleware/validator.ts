@@ -1,49 +1,47 @@
-import { NextFunction, Request, Response } from "express";
-import { ObjectSchema } from "joi";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ZodSchema, ZodError } from "zod";
 
 type Schema = {
-  body?: ObjectSchema;
-  query?: ObjectSchema;
-  params?: ObjectSchema;
+  body?: ZodSchema<any>;
+  query?: ZodSchema<any>;
+  params?: ZodSchema<any>;
 };
 
-export const validate = (schemas: Schema) => {
+export const validate = (schemas: Schema): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const options = { abortEarly: false, stripUnknown: true };
+    try {
+      const validated: any = {};
+      if (schemas.body) {
+        validated.body = schemas.body.parse(req.body);
+      }
 
-    if (schemas.body) {
-      const { error, value } = schemas.body.validate(req.body, options);
-      if (error) {
+      if (schemas.query) {
+        validated.query = schemas.query.parse(req.query);
+      }
+
+      if (schemas.params) {
+        validated.params = schemas.params.parse(req.params);
+      }
+
+      (req as any).validated = validated;
+
+      next();
+    } catch (err: any) {
+       console.error("🔥 RAW ERROR:", err);
+      console.error("🔥 TYPE:", typeof err);
+      console.error("🔥 INSTANCE:", err instanceof Error);
+      console.error("🔥 CONSTRUCTOR:", (err as any)?.constructor?.name);
+      if (err instanceof ZodError) {
         return res.status(400).json({
-          message: "Validation error (body)",
-          errors: error.details.map((d) => d.message),
+          message: "Validation error",
+          errors: err.issues.map((e) => e.message),
         });
       }
-      req.body = value;
-    }
 
-    if (schemas.query) {
-      const { error, value } = schemas.query.validate(req.query, options);
-      if (error) {
-        return res.status(400).json({
-          message: "Validation error (query)",
-          errors: error.details.map((d) => d.message),
-        });
-      }
-      req.query = value;
+      return res.status(400).json({
+        message: "Validation error",
+        errors: ["Unknown validation error"],
+      });
     }
-
-    if (schemas.params) {
-      const { error, value } = schemas.params.validate(req.params, options);
-      if (error) {
-        return res.status(400).json({
-          message: "Validation error (params)",
-          errors: error.details.map((d) => d.message),
-        });
-      }
-      req.params = value;
-    }
-
-    next();
   };
 };

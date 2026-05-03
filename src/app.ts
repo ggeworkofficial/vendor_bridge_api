@@ -8,8 +8,10 @@ import { errorHandler } from './middleware/errorHandler';
 import Postgres from './connection/postgres';
 import './connection/redis';
 import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.route';
 import { authenticate } from './middleware/authenticator';
 import { checkRole, Role } from './middleware/roleChecker';
+import { checkOwnershipOrAdmin } from "./middleware/ownershipOrAdminChecker";
 
 
 dotenv.config();
@@ -40,11 +42,12 @@ declare module "express-serve-static-core" {
     await Postgres.connect();
 
     //routes here
-    app.get("/api/test", authenticate, checkRole("admin"), (req: express.Request, res: express.Response) => {
+    app.get("/api/test/:id", authenticate, checkOwnershipOrAdmin(), (req: express.Request, res: express.Response) => {
         res.send("API running");
     });
 
     app.use('/api/auth', authRoutes);
+    app.use('/api/users', userRoutes);
 
     app.use(errorHandler);
 
