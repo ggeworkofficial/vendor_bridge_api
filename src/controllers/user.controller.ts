@@ -34,10 +34,10 @@ export const getUsers = async (req: Request<{}, any, any, any>, res: Response, n
 };
 
 
-export const updateUser = async (req: Request<GetOneUserParams, any, any>, res: Response, next: NextFunction) => {
+export const updateUser = async (req: Request<GetOneUserParams, any, UpdateUserBody>, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
-        const user = await userService.update(id, req.body as UpdateUserBody, req.user?.role === "admin");
+        const user = await userService.update(id, req.body, req.user?.role === "admin");
         return res.status(200).json({ message: "User updated", data: user });
 
     } catch (error) {

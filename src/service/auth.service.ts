@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession, getUserRole } from "../repositories/auth.repository";
+import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession, getUserRole, getUserStatus } from "../repositories/auth.repository";
 import { User } from "../models";
 import { createError } from "../helpers/error";
 import { LoginBody, RegisterBody } from "../validators/auth.validator";
@@ -61,9 +61,14 @@ class AuthService {
     const passwordMatches = await bcrypt.compare(payload.password, user.password);
     if (!passwordMatches) throw createError("Invalid credentials", 401);
 
+    const userStatus = await getUserStatus(user.id);
+    if (!userStatus || userStatus === 'suspended') {
+      throw createError("Account is suspended", 403);
+    }
+
     const sessionId = randomUUID();
     const lastActive = new Date();
-    await createSession(sessionId, user.id, lastActive);
+    await createSession(sessionId, user.role, user.id, lastActive);
 
     return {
       ...this.sanitizeUser(user),
@@ -78,14 +83,11 @@ class AuthService {
 
     if (session.ttl <= 0) throw createError("Session expired", 401);
 
-    const role = await getUserRole(session.user_id);
-    if (!role) throw createError("User not found", 401);
-
     return {
       user_id: session.user_id,
       last_active: session.last_active,
       ttl: session.ttl,
-      role: role
+      role: session.role,
     };
   }
 

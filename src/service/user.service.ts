@@ -14,6 +14,7 @@ import {
 import { User } from "../models";
 import { CreateUserBody, DeleteUserParams, GetUserQuery, UpdateUserBody } from "../validators/user.validator";
 import { removeUndefined } from "../utils/removeUndefined";
+import { clearSessionsForUser, removeSession } from "../repositories/auth.repository";
 
 interface PaginationResult<T> {
   data: T[];
@@ -100,6 +101,8 @@ class UserService {
       }
     }
 
+    
+
     const normalizedPayload: UpdateUserBody = { ...payload };
     if (normalizedPayload.email) {
       normalizedPayload.email = normalizedPayload.email.toLowerCase();
@@ -110,12 +113,22 @@ class UserService {
       throw createError("Unable to update user", 400);
     }
 
+    const isBecomingSuspended =
+    payload.status === 'suspended' && user.status !== 'suspended';
+
+    const isRoleChanged =
+    payload.role && payload.role !== user.role;
+    if (adminUpdate && (isBecomingSuspended || isRoleChanged)) {
+        await clearSessionsForUser(id);
+    }
+
     return this.sanitizeUser(updated);
   }
 
   async delete(id: DeleteUserParams["id"]) {
     const deleted = await destroyUser(id);
     if (!deleted) throw createError("User not found", 404);
+    await clearSessionsForUser(id);
   }
 }
 
