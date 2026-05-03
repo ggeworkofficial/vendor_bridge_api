@@ -3,18 +3,8 @@ import bcrypt from "bcryptjs";
 import { createUser, createSession, findUserByEmail, getSession, updateSession, findUserById, removeSession, getUserRole } from "../repositories/auth.repository";
 import { User } from "../models";
 import { createError } from "../helpers/error";
+import { LoginBody, RegisterBody } from "../validators/auth.validator";
 
-
-interface RegisterPayload {
-  full_name: string;
-  email: string;
-  password: string;
-}
-
-interface LoginPayload {
-  email: string;
-  password: string;
-}
 
 interface AuthResult {
   id: string;
@@ -43,7 +33,7 @@ class AuthService {
     return rest as AuthResult;
   }
 
-  async register(payload: RegisterPayload): Promise<AuthResult> {
+  async register(payload: RegisterBody): Promise<AuthResult> {
     const email = payload.email.toLowerCase();
 
     const existingUser = await findUserByEmail(email);
@@ -62,7 +52,7 @@ class AuthService {
     return this.sanitizeUser(user);
   }
 
-  async login(payload: LoginPayload): Promise<AuthResult> {
+  async login(payload: LoginBody): Promise<AuthResult> {
     const email = payload.email.toLowerCase();
 
     const user = await findUserByEmail(email);

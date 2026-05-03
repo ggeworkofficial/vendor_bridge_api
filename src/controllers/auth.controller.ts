@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import AuthService from "../service/auth.service";
 import axios from "axios";
 import { setSessionCookie } from "../helpers/auth";
+import { RegisterBody, LoginBody } from "../validators/auth.validator";
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request<{}, any, RegisterBody>, res: Response, next: NextFunction) => {
   try {
     const user = await AuthService.register(req.body);
     const loginResult = await AuthService.login({ 
@@ -22,7 +23,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: Request<{}, any, LoginBody>, res: Response, next: NextFunction) => {
   try {
     const user = await AuthService.login(req.body);
     const { session_id, ...safeResult} = user
