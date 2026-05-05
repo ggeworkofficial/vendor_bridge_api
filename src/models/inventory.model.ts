@@ -24,7 +24,7 @@ interface InventoryAttributes {
   id: string;
   name: string;
   description?: string;
-  price: string;
+  price: number;
   quality_label?: string;
   verified?: boolean;
   category_id?: string;
@@ -65,7 +65,7 @@ export default class Inventory extends Model<InventoryAttributes, InventoryCreat
   @Column({
     type: DataType.DECIMAL,
   })
-  price!: string;
+  price!: number;
 
   @Column({
     type: DataType.STRING(50),
