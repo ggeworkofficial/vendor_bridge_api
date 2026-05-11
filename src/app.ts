@@ -9,9 +9,15 @@ import Postgres from './connection/postgres';
 import './connection/redis';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.route';
+import categoryRoutes from './routes/category.routes';
+import sellerRoutes from './routes/seller.routes';
+import inventoryRoutes from './routes/inventory.routes';
+import productImageRoutes from './routes/product-image.routes';
+import reviewRoutes from './routes/review.routes';
 import { authenticate } from './middleware/authenticator';
 import { checkRole, Role } from './middleware/roleChecker';
 import { checkOwnershipOrAdmin } from "./middleware/ownershipOrAdminChecker";
+import path from 'path';
 
 
 dotenv.config();
@@ -48,6 +54,12 @@ declare module "express-serve-static-core" {
 
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
+    app.use('/api/categories', categoryRoutes);
+    app.use('/api/sellers', sellerRoutes);
+    app.use('/api/inventory', inventoryRoutes);
+    app.use('/api/product-images', productImageRoutes);
+    app.use('/api/reviews', reviewRoutes);
+    app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 
     app.use(errorHandler);
 
