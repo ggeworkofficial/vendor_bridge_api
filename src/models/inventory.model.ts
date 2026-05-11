@@ -20,12 +20,13 @@ import Review from "./review.model";
 import CartItem from "./cart-item.model";
 import OrderItem from "./order-item.model";
 
+export type QualityLable = 'high' | 'medium' | 'low';
 interface InventoryAttributes {
   id: string;
   name: string;
   description?: string;
   price: number;
-  quality_label?: string;
+  quality_label: QualityLable;
   verified?: boolean;
   category_id?: string;
   seller_id?: string;
@@ -67,10 +68,11 @@ export default class Inventory extends Model<InventoryAttributes, InventoryCreat
   })
   price!: number;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING(50),
   })
-  quality_label?: string;
+  quality_label!: QualityLable;
 
   @Default(false)
   @AllowNull(false)
@@ -84,7 +86,7 @@ export default class Inventory extends Model<InventoryAttributes, InventoryCreat
   @Column({
     type: DataType.UUID,
   })
-  category_id?: string;
+  category_id!: string;
 
   @BelongsTo(() => Category)
   category?: Category;
@@ -94,7 +96,7 @@ export default class Inventory extends Model<InventoryAttributes, InventoryCreat
   @Column({
     type: DataType.UUID,
   })
-  seller_id?: string;
+  seller_id!: string;
 
   @BelongsTo(() => Seller)
   seller?: Seller;

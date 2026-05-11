@@ -16,13 +16,14 @@ import Inventory from "./inventory.model";
 
 interface ProductImageAttributes {
   id: string;
-  product_id?: string;
+  product_id: string;
   image_url: string;
+  is_primary?: boolean;
   created_at?: Date;
   updated_at?: Date;
 }
 
-interface ProductImageCreationAttributes extends Optional<ProductImageAttributes, "created_at" | "updated_at"> {}
+interface ProductImageCreationAttributes extends Optional<ProductImageAttributes, "is_primary" | "created_at" | "updated_at"> {}
 
 @Table({
   tableName: "product_images",
@@ -43,7 +44,7 @@ export default class ProductImage extends Model<ProductImageAttributes, ProductI
   @Column({
     type: DataType.UUID,
   })
-  product_id?: string;
+  product_id!: string;
 
   @BelongsTo(() => Inventory)
   product?: Inventory;
@@ -53,6 +54,13 @@ export default class ProductImage extends Model<ProductImageAttributes, ProductI
     type: DataType.TEXT,
   })
   image_url!: string;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN
+  })
+  is_primary?: boolean;
 
   @CreatedAt
   @Column({
