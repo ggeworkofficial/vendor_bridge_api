@@ -5,6 +5,7 @@ import { Category, Inventory, ProductImage, Review, Seller } from "../models";
 import { QualityLable } from "../models/inventory.model";
 import { PaginationResponse } from "../types/pageination";
 import { mapProductImage } from "../utils/imageMapper";
+import redis from "../connection/redis";
 
 
 export interface ProductBase {
@@ -191,3 +192,61 @@ export const removeProduct = async (id: string): Promise<boolean> => {
     return await Inventory.destroy({ where: { id } }) > 0;
 }
 
+export const getCachedProduct = async (id: string): Promise<ProductResult | null> => {
+    const key = `product:${id}`;
+    const cached = await redis.get(key);
+    if (!cached) return null;
+    return JSON.parse(cached);
+}
+
+export const setCachedProduct = async (id: string, data: ProductResult, ttl = 600): Promise<void> => {
+    const key = `product:${id}`;
+    await redis.set(key, JSON.stringify(data), "EX", ttl);
+}
+
+export const deleteCachedProduct = async (id: string): Promise<void> => {
+    const key = `product:${id}`;
+    await redis.del(key);
+};
+
+export const buildProductKey = async (payload: GetInventoryOption): Promise<string> => {
+    const {
+        page,
+        limit,
+        quality_label,
+        verified,
+        search,
+        sort,
+        order,
+    } = payload;
+    const versionKey = "products:version";
+    await redis.setnx(versionKey, 1);
+    const version = await redis.get(versionKey);
+    return [
+        "products",
+        `v${version}`,
+        page,
+        limit,
+        quality_label ?? "null",
+        verified ?? "null",
+        search ?? "null",
+        sort,
+        order
+    ].join(":");
+}
+
+export const getCachedProducts = async (key: GetInventoryOption): Promise<PaginationResponse<ProductResult> | null> => {
+    const productKey = await buildProductKey(key);
+    const products = await redis.get(productKey);
+    if (!products) return null;
+    return JSON.parse(products);
+}
+
+export const setCachedProducts = async (key: GetInventoryOption, data: PaginationResponse<ProductResult>, ttl = 60): Promise<void> => {
+    const productKey = await buildProductKey(key);
+    await redis.set(productKey, JSON.stringify(data), "EX", ttl);
+}
+
+export const invalidateCachedProducts = async (): Promise<void> => {
+    await redis.incr("products:version");
+}

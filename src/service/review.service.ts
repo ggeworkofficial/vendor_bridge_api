@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { removeUndefined } from '../utils/removeUndefined';
 import { ReviewResult } from '../repositories/review.repository';
 import { createError } from '../helpers/error';
+import { deleteCachedProduct, invalidateCachedProducts } from '../repositories/inventory.repository';
 
 type CreateReviewOption = CreateReviewBody & {
     user_id: string;
@@ -19,7 +20,10 @@ export class ReviewService {
             updated_at: new Date()
         };
         const cleanData = removeUndefined(reviewData);
-        return await createReview(cleanData);
+        const review = await createReview(cleanData);
+        await deleteCachedProduct(data.product_id);
+        await invalidateCachedProducts();
+        return review;
     }
 
     async getOne(id: GetReviewParam['id']): Promise<ReviewResult> {
@@ -41,12 +45,14 @@ export class ReviewService {
         const cleanData = removeUndefined(updateData)
         const review = await updateReview(id, cleanData);
         if (!review) throw createError("Review not found", 404);
+        await invalidateCachedProducts();
         return review;
     }
 
     async remove(id: GetReviewParam['id']): Promise<boolean> {
         const success = await deleteReview(id);
         if (!success) throw createError("Review not found", 404);
+        await invalidateCachedProducts();
         return success;
     }
 }

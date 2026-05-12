@@ -1,5 +1,6 @@
 import { createError } from "../helpers/error";
 import { CategoryResult, CreateCategory, deleteCategory, findAllCategories, findCategoryById, updateCategory } from "../repositories/category.repository";
+import { invalidateCachedProducts } from "../repositories/inventory.repository";
 import { removeUndefined } from "../utils/removeUndefined";
 import { CreateCategoryBody, GetOneCategoryParams, UpdateCategoryBody } from "../validators/category.validator";
 
@@ -27,12 +28,14 @@ export default class CategoryService {
         const cleanData = removeUndefined({ ...data, updated_at });
         const result = await updateCategory(data.id, cleanData);
         if (!result) throw createError("Category not found", 404);
+        await invalidateCachedProducts();
         return result;
     }
 
     async deleteCategory(data: GetOneCategoryParams): Promise<boolean> {
         const success = await deleteCategory(data.id);
         if (!success) throw createError('Category not found', 404);
+        await invalidateCachedProducts();
         return success;
     }
 }

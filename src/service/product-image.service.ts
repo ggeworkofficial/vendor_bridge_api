@@ -3,6 +3,7 @@ import { createProductImages, deleteProductImage, getProductImage, getProductIma
 import { CreateProductImageBody, UpdateProductImageBody } from "../validators/product-image.validator";
 import { removeUndefined } from "../utils/removeUndefined";
 import { createError } from "../helpers/error";
+import { deleteCachedProduct, invalidateCachedProducts } from "../repositories/inventory.repository";
 
 
 type CreateProductImageOption = Omit<CreateProductImageBody, "is_primary"> & { 
@@ -20,7 +21,14 @@ export class ProductImageService {
             updated_at: new Date(),
             ... data
         }));
-        return await createProductImages(properData, transaction);
+        
+        const productImages = await createProductImages(properData, transaction);
+        const productIds = [...new Set(
+            data.map(item => item.product_id)
+        )];
+        await Promise.all(productIds.map(id => deleteCachedProduct(id)));
+        await invalidateCachedProducts();
+        return productImages;
     }
 
     async getProductImage(id: string): Promise<ProductImageReuslt> {
@@ -37,9 +45,11 @@ export class ProductImageService {
     async update(id: string, data: UpdateProductImageOption): Promise<void>  {
         const cleanData = removeUndefined({ ...data, updated_at: new Date()})
         await updateProductImage(id, cleanData);
+        await invalidateCachedProducts();
     }
 
-    async deleteProduct(id: string): Promise<void> {
+    async deleteProductImage(id: string): Promise<void> {
         await deleteProductImage(id);
+        await invalidateCachedProducts();
     }
 }

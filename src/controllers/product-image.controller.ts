@@ -91,7 +91,7 @@ export const deleteProductImage = async ( req: Request<GetProductImageParam>, re
         const id = req.params.id;
         const productImage = await productImageService.getProductImage(id);
         await deleteFiles([productImage.image_name]);
-        await productImageService.deleteProduct(id);
+        await productImageService.deleteProductImage(id);
 
         res.status(200).json({
             success: true,

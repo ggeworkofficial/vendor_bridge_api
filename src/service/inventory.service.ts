@@ -1,4 +1,4 @@
-import { createProduct, getProduct, getProducts, updateProduct, removeProduct, ProductResult, ProductBase } from '../repositories/inventory.repository';
+import { createProduct, getProduct, getProducts, updateProduct, removeProduct, ProductResult, ProductBase, getCachedProduct, setCachedProduct, getCachedProducts, setCachedProducts, invalidateCachedProducts, deleteCachedProduct } from '../repositories/inventory.repository';
 import { CreateInventoryBody, GetProductParam, GetInventoryQuery, UpdateInventoryBody } from '../validators/inventory.validator';
 import { PaginationResponse } from '../types/pageination';
 import { randomUUID } from 'crypto';
@@ -27,11 +27,19 @@ export class InventoryService {
             updated_at: new Date()
         };
         const cleanProduct = removeUndefined(productData);
-        return await createProduct(cleanProduct, transaction);
+        const product = await createProduct(cleanProduct, transaction);
+        await invalidateCachedProducts();
+        return product;
     }
 
-    async getOne(id: GetProductParam['id']): Promise<ProductReturn | null> {
-        return await getProduct(id);
+    async getOne(id: GetProductParam['id']): Promise<ProductReturn> {
+        const cachedProduct = await getCachedProduct(id);
+        if (cachedProduct) return cachedProduct;
+
+        const product = await getProduct(id);
+        if (!product) throw createError("Product not found", 404);
+        await setCachedProduct(id, product);
+        return product;
     }
 
     async getAll(query: GetInventoryQuery): Promise<PaginationResponse<ProductReturn>> {
@@ -44,7 +52,11 @@ export class InventoryService {
             ...(query.verified !== undefined && { verified: query.verified }),
             ...(query.search && { search: query.search })
         };
-        return await getProducts(queryData);
+        const cachedProducts = await getCachedProducts(queryData);
+        if (cachedProducts) return cachedProducts;
+        const products = await getProducts(queryData);
+        if (products) await setCachedProducts(queryData, products);
+        return products;
     }
 
     async update(id: GetProductParam['id'], data: UpdateInventoryBody): Promise<ProductReturn | null> {
@@ -53,14 +65,19 @@ export class InventoryService {
             updated_at: new Date()
         };
         const cleanData = removeUndefined(updateData);
-        return await updateProduct(id, cleanData);
+        const product = await updateProduct(id, cleanData);
+        await deleteCachedProduct(id);
+        await invalidateCachedProducts();
+        return product;
     }
 
     async remove(id: GetProductParam['id']): Promise<string[]> {
         const productImages = await getProductImages(id);
         if (!productImages) throw createError("images not found", 404);
         const images = productImages.map(image => image.image_url);
-        await removeProduct(id)
+        await removeProduct(id);
+        await deleteCachedProduct(id);
+        await invalidateCachedProducts();
         return images;
     }
 }

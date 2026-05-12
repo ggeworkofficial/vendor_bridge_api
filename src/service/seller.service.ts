@@ -1,4 +1,5 @@
 import { createError } from "../helpers/error";
+import { invalidateCachedProducts } from "../repositories/inventory.repository";
 import { createSeller, deleteSeller, getAllSellers, getSellerById, SellerCreateResult, SellerResult, updateSeller } from "../repositories/seller.repository";
 import { findUserById } from "../repositories/user.repository";
 import { removeUndefined } from "../utils/removeUndefined";
@@ -31,12 +32,14 @@ export default class SellerService {
         const cleanData = removeUndefined({ ...data, updated_at });
         const result = await updateSeller(cleanData);
         if (!result) throw createError("Seller not found", 404);
+        await invalidateCachedProducts();
         return result;
     }
 
     async deleteSeller(data: GetOneSellerParams): Promise<boolean> {
         const success = await deleteSeller(data.id);
         if (!success) throw createError("Seller not found", 404);
+        await invalidateCachedProducts();
         return success;
     }
 }

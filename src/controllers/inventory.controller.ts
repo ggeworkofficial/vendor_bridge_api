@@ -43,10 +43,6 @@ export const getProduct = async (req: Request<GetProductParam>, res: Response, n
     try {
         const { id } = req.params;
         const result = await inventoryService.getOne(id);
-        if (!result) {
-            res.status(404).json({ message: 'Inventory not found' });
-            return;
-        }
         res.status(200).json(result);
     } catch (error) {
         next(error);
