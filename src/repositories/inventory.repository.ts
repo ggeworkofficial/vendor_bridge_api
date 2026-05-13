@@ -14,6 +14,7 @@ export interface ProductBase {
     description?: string,
     price: number,
     quality_label: QualityLable,
+    quantity: number,
     verified: boolean,
     category_id: string,
     seller_id: string,
@@ -27,8 +28,8 @@ interface GetInventoryOption {
     limit: number,
     quality_label?: QualityLable,
     verified?: boolean,
-    search?: string
-    sort: 'name' | 'price' | 'verified' | 'created_at',
+    search?: string,
+    sort: 'name' | 'quantity' | 'price' | 'verified' | 'created_at',
     order: 'asc' | 'desc'
 }
 
@@ -57,6 +58,7 @@ const mapInventory = (product: any): ProductResult => {
         description: product.description || "",
         price: product.price,
         quality_label: product.quality_label,
+        quantity: product.quantity,
         verified: product.verified,
         images: (product.images || []).map(mapProductImage),
         category: { id: product.category?.id || "", name: product.category?.name || ""},
@@ -76,6 +78,23 @@ export const createProduct = async (data: ProductBase, transaction: Transaction)
     } catch(error: any) {
         throw createError(error.message, 500);
     }  
+}
+
+export const getProductQuantity = async (id: string): Promise<number | null> => {
+    const product = await Inventory.findByPk(id);
+    if (!product) return null;
+    return product.quantity;
+}
+
+export const getProductQuantities = async (ids: string[]): Promise<{id: string, quantity: number}[]> => {
+    const products = await Inventory.findAll({
+        where: { id: ids},
+        attributes: ["id", "quantity"]
+    });
+    return products.map(product => ({
+        id: product.id,
+        quantity: product.quantity
+    }));
 }
 
 export const getProduct = async (id: string): Promise<ProductResult | null> => {
@@ -192,14 +211,14 @@ export const removeProduct = async (id: string): Promise<boolean> => {
     return await Inventory.destroy({ where: { id } }) > 0;
 }
 
-export const getCachedProduct = async (id: string): Promise<ProductResult | null> => {
+export const getCachedProduct = async (id: string): Promise<Omit<ProductResult, 'quantity'> | null> => {
     const key = `product:${id}`;
     const cached = await redis.get(key);
     if (!cached) return null;
     return JSON.parse(cached);
 }
 
-export const setCachedProduct = async (id: string, data: ProductResult, ttl = 600): Promise<void> => {
+export const setCachedProduct = async (id: string, data: Omit<ProductResult, 'quantity'>, ttl = 600): Promise<void> => {
     const key = `product:${id}`;
     await redis.set(key, JSON.stringify(data), "EX", ttl);
 }
@@ -235,14 +254,14 @@ export const buildProductKey = async (payload: GetInventoryOption): Promise<stri
     ].join(":");
 }
 
-export const getCachedProducts = async (key: GetInventoryOption): Promise<PaginationResponse<ProductResult> | null> => {
+export const getCachedProducts = async (key: GetInventoryOption): Promise<PaginationResponse<Omit<ProductResult, 'quantity'>> | null> => {
     const productKey = await buildProductKey(key);
     const products = await redis.get(productKey);
     if (!products) return null;
     return JSON.parse(products);
 }
 
-export const setCachedProducts = async (key: GetInventoryOption, data: PaginationResponse<ProductResult>, ttl = 60): Promise<void> => {
+export const setCachedProducts = async (key: GetInventoryOption, data: PaginationResponse<Omit<ProductResult, 'quantity'>>, ttl = 60): Promise<void> => {
     const productKey = await buildProductKey(key);
     await redis.set(productKey, JSON.stringify(data), "EX", ttl);
 }

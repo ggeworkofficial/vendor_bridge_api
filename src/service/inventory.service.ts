@@ -1,4 +1,4 @@
-import { createProduct, getProduct, getProducts, updateProduct, removeProduct, ProductResult, ProductBase, getCachedProduct, setCachedProduct, getCachedProducts, setCachedProducts, invalidateCachedProducts, deleteCachedProduct } from '../repositories/inventory.repository';
+import { createProduct, getProduct, getProducts, updateProduct, removeProduct, ProductResult, ProductBase, getCachedProduct, setCachedProduct, getCachedProducts, setCachedProducts, invalidateCachedProducts, deleteCachedProduct, getProductQuantities, getProductQuantity } from '../repositories/inventory.repository';
 import { CreateInventoryBody, GetProductParam, GetInventoryQuery, UpdateInventoryBody } from '../validators/inventory.validator';
 import { PaginationResponse } from '../types/pageination';
 import { randomUUID } from 'crypto';
@@ -34,12 +34,16 @@ export class InventoryService {
 
     async getOne(id: GetProductParam['id']): Promise<ProductReturn> {
         const cachedProduct = await getCachedProduct(id);
-        if (cachedProduct) return cachedProduct;
+        if (cachedProduct) {
+            const quantity = await getProductQuantity(cachedProduct.id);
+            return {...cachedProduct, quantity: quantity || 0};
+        }
 
         const product = await getProduct(id);
         if (!product) throw createError("Product not found", 404);
-        await setCachedProduct(id, product);
-        return product;
+        const { quantity, ...rest} = product;
+        await setCachedProduct(id, rest);
+        return {...rest, quantity};
     }
 
     async getAll(query: GetInventoryQuery): Promise<PaginationResponse<ProductReturn>> {
@@ -53,9 +57,20 @@ export class InventoryService {
             ...(query.search && { search: query.search })
         };
         const cachedProducts = await getCachedProducts(queryData);
-        if (cachedProducts) return cachedProducts;
+        if (cachedProducts) {
+            const quantities = await getProductQuantities(cachedProducts.data.map(product => product.id));
+            const quantityMap = new Map(quantities.map(item => [item.id, item.quantity]));
+            const data = cachedProducts.data.map(product => ({
+                ...product,
+                quantity: quantityMap.get(product.id) || 0,
+            }))
+            const meta = cachedProducts.meta;
+            return {data, meta};
+        };
         const products = await getProducts(queryData);
-        if (products) await setCachedProducts(queryData, products);
+        const data = products.data.map(({quantity, ...rest}) => rest)
+        const meta = products.meta;
+        if (products) await setCachedProducts(queryData, {data, meta});
         return products;
     }
 

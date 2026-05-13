@@ -1,7 +1,7 @@
 import z from 'zod';
 
 const QualityLableEnum = z.enum(['high', 'medium', 'low']);
-const SortEnum = z.enum(['name', 'price', 'verified', 'created_at']);
+const SortEnum = z.enum(['name', 'quantity', 'price', 'verified', 'created_at']);
 const OrderEnum = z.enum(['asc', 'desc'])
 
 export const createProductSchema = z.object({
@@ -9,6 +9,7 @@ export const createProductSchema = z.object({
     description: z.string().optional(),
     price: z.coerce.number().min(0),
     quality_label: QualityLableEnum,
+    quantity: z.number().default(0),
     verified: z.boolean().default(false),
     category_id: z.uuid(),
     seller_id: z.uuid(),
@@ -34,6 +35,7 @@ export const updateProductSchema = z.object({
     description: z.string().optional(),
     price: z.number().min(0).optional(),
     quality_label: QualityLableEnum.optional(),
+    quantity: z.number().optional(),
     verified: z.boolean().optional(),
     category_id: z.uuid().optional(),
     seller_id: z.uuid().optional(),

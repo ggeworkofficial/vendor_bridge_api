@@ -27,6 +27,7 @@ interface InventoryAttributes {
   description?: string;
   price: number;
   quality_label: QualityLable;
+  quantity: number;
   verified?: boolean;
   category_id?: string;
   seller_id?: string;
@@ -73,6 +74,13 @@ export default class Inventory extends Model<InventoryAttributes, InventoryCreat
     type: DataType.STRING(50),
   })
   quality_label!: QualityLable;
+
+  @AllowNull(false)
+  @Default(0)
+  @Column({
+    type: DataType.NUMBER,
+  })
+  quantity!: number;
 
   @Default(false)
   @AllowNull(false)
