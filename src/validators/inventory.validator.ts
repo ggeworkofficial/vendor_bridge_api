@@ -23,8 +23,14 @@ export const getProductSchema = z.object({
 export const getInventorySchema = z.object({
     page: z.coerce.number().min(1).default(1),
     limit: z.coerce.number().min(1).max(100).default(10),
-    quality_label: QualityLableEnum.optional(),
-    verified: z.coerce.boolean().optional(),
+    quality_label: z.preprocess((val) => {
+        if (!val || val === "") return undefined;
+        return val;
+    }, QualityLableEnum.optional()).optional(),    
+    verified: z.preprocess((val) => {
+        if (val === "true") return true;
+        if (val === "false") return false;
+    }, z.boolean().optional()).optional(),
     search: z.string().trim().min(1).max(100).optional(),
     sort: SortEnum.default('created_at'),
     order: OrderEnum.default('desc')
