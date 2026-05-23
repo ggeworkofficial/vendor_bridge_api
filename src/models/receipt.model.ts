@@ -12,16 +12,17 @@ import {
   UpdatedAt,
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
-import Order from "./order.model";
+import * as Order from "./order.model";
 
+export type ReceiptStatus = 'pending_review' | 'approved' | 'rejected';
 interface ReceiptAttributes {
   id: string;
   order_id?: string;
-  amount: string;
-  payment_method: string;
+  amount: number;
+  payment_method: Order.PaymentMethod;
   account?: string;
   file_url: string;
-  status: string;
+  status: ReceiptStatus;
   note?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -43,21 +44,21 @@ export default class Receipt extends Model<ReceiptAttributes, ReceiptCreationAtt
   })
   id!: string;
 
-  @ForeignKey(() => Order)
+  @ForeignKey(() => Order.default)
   @AllowNull(true)
   @Column({
     type: DataType.UUID,
   })
   order_id?: string;
 
-  @BelongsTo(() => Order)
-  order?: Order;
+  @BelongsTo(() => Order.default)
+  order?: Order.default;
 
   @AllowNull(false)
   @Column({
     type: DataType.DECIMAL(10, 2),
   })
-  amount!: string;
+  amount!: number;
 
   @AllowNull(false)
   @Column({
@@ -66,7 +67,7 @@ export default class Receipt extends Model<ReceiptAttributes, ReceiptCreationAtt
       isIn: [["full", "advance", "cod"]],
     },
   })
-  payment_method!: string;
+  payment_method!: Order.PaymentMethod;
 
   @AllowNull(false)
   @Column({
@@ -87,7 +88,7 @@ export default class Receipt extends Model<ReceiptAttributes, ReceiptCreationAtt
       isIn: [["pending_review", "approved", "rejected"]],
     },
   })
-  status!: string;
+  status!: ReceiptStatus;
 
   @Column({
     type: DataType.TEXT,
