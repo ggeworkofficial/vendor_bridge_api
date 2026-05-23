@@ -14,6 +14,9 @@ import sellerRoutes from './routes/seller.routes';
 import inventoryRoutes from './routes/inventory.routes';
 import productImageRoutes from './routes/product-image.routes';
 import reviewRoutes from './routes/review.routes';
+import orderRoutes from './routes/order.routes';
+import receiptRoutes from './routes/receipt.routes';
+import complaintRoutes from './routes/complaint.routes';
 import { authenticate } from './middleware/authenticator';
 import { checkRole, Role } from './middleware/roleChecker';
 import { checkOwnershipOrAdmin } from "./middleware/ownershipOrAdminChecker";
@@ -59,7 +62,14 @@ declare module "express-serve-static-core" {
     app.use('/api/inventory', inventoryRoutes);
     app.use('/api/product-images', productImageRoutes);
     app.use('/api/reviews', reviewRoutes);
+    app.use('/api/orders', orderRoutes);
+    app.use('/api/receipts', receiptRoutes);
+    app.use('/api/complaints', complaintRoutes);
     app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
+
+    app.use((req, res) => {
+      res.status(404).send('Page not found');
+    })
 
     app.use(errorHandler);
 
