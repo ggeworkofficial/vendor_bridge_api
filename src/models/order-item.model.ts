@@ -20,7 +20,7 @@ interface OrderItemAttributes {
   order_id?: string;
   product_id?: string;
   quantity: number;
-  price: string;
+  price: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -79,7 +79,7 @@ export default class OrderItem extends Model<OrderItemAttributes, OrderItemCreat
   @Column({
     type: DataType.DECIMAL(10, 2),
   })
-  price!: string;
+  price!: number;
 
   @CreatedAt
   @Column({
