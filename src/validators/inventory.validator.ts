@@ -9,7 +9,7 @@ export const createProductSchema = z.object({
     description: z.string().optional(),
     price: z.coerce.number().min(0),
     quality_label: QualityLableEnum,
-    quantity: z.number().default(0),
+    quantity: z.coerce.number().default(0),
     verified: z.boolean().default(false),
     category_id: z.uuid(),
     seller_id: z.uuid(),

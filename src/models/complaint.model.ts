@@ -17,14 +17,16 @@ import User from "./user.model";
 import ComplaintMessage from "./complaint-message.model";
 import Order from "./order.model";
 
+export type ComplaintStatus = 'open' | 'investigating' | 'resolved';
+export type ComplaintPriority = 'low' | 'medium' | 'high';
+
 interface ComplaintAttributes {
   id: string;
-  user_id?: string;
   order_id?: string;
   subject: string;
   description: string;
-  status: string;
-  priority: string;
+  status: ComplaintStatus;
+  priority: ComplaintPriority;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -44,16 +46,6 @@ export default class Complaint extends Model<ComplaintAttributes, ComplaintCreat
     type: DataType.UUID,
   })
   id!: string;
-
-  @ForeignKey(() => User)
-  @AllowNull(true)
-  @Column({
-    type: DataType.UUID,
-  })
-  user_id?: string;
-
-   @BelongsTo(() => User)
-  user?: User;
 
   @ForeignKey(() => Order)
   @AllowNull(true)
@@ -83,7 +75,7 @@ export default class Complaint extends Model<ComplaintAttributes, ComplaintCreat
       isIn: [["open", "investigating", "resolved"]],
     },
   })
-  status!: string;
+  status!: ComplaintStatus;
 
   @AllowNull(false)
   @Column({
@@ -92,7 +84,7 @@ export default class Complaint extends Model<ComplaintAttributes, ComplaintCreat
       isIn: [["low", "medium", "high"]],
     },
   })
-  priority!: string;
+  priority!: ComplaintPriority;
 
   @CreatedAt
   @Column({

@@ -115,7 +115,4 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
 
   @HasMany(() => Review)
   reviews?: Review[];
-
-  @HasMany(() => Complaint)
-  complaints?: Complaint[];
 }
