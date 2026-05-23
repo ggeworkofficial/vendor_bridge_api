@@ -15,12 +15,17 @@ import {
 import { Optional } from "sequelize";
 import Order from "./order.model";
 
+export type LogisticsStatus =
+  | 'processing'
+  | 'in_transit'
+  | 'out_for_delivery'
+  | 'delivered';
 interface LogisticsAttributes {
   id: string;
   order_id: string;
   carrier: string;
   tracking_number: string;
-  status: string;
+  status: LogisticsStatus;
   origin: string;
   destination: string;
   estimated_eta?: Date;
@@ -75,7 +80,7 @@ export default class Logistics extends Model<LogisticsAttributes, LogisticsCreat
       isIn: [["processing", "in_transit", "out_for_delivery", "delivered"]],
     },
   })
-  status!: string;
+  status!: LogisticsStatus;
 
   @AllowNull(false)
   @Column({
