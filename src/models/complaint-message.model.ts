@@ -12,17 +12,17 @@ import {
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
 import Complaint from "./complaint.model";
+import User from "./user.model";
 
 interface ComplaintMessageAttributes {
   id: string;
   complaint_id?: string;
-  sender_type: string;
-  sender_id?: string;
+  sender_id: string;
   message: string;
   created_at?: Date;
 }
 
-interface ComplaintMessageCreationAttributes extends Optional<ComplaintMessageAttributes, "sender_id" | "created_at"> {}
+interface ComplaintMessageCreationAttributes extends Optional<ComplaintMessageAttributes, "created_at"> {}
 
 @Table({
   tableName: "complaint_messages",
@@ -48,19 +48,15 @@ export default class ComplaintMessage extends Model<ComplaintMessageAttributes, 
   @BelongsTo(() => Complaint)
   complaint?: Complaint;
 
+  @ForeignKey(() => User)
   @AllowNull(false)
-  @Column({
-    type: DataType.STRING(20),
-    validate: {
-      isIn: [["user", "admin"]],
-    },
-  })
-  sender_type!: string;
-
   @Column({
     type: DataType.UUID,
   })
-  sender_id?: string;
+  sender_id!: string;
+
+  @BelongsTo(() => User)
+  user!: User;
 
   @AllowNull(false)
   @Column({
