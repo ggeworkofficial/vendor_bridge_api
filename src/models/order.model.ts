@@ -19,13 +19,16 @@ import Receipt from "./receipt.model";
 import Logistics from "./logistics.model";
 import Complaint from "./complaint.model";
 
+export type OrderStatus = 'pending' | 'confirmed' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'rejected';
+export type PaymentStatus = 'paid' | 'unpaid' | 'pending_review' | 'rejected';
+export type PaymentMethod = 'full' | 'advance' | 'cod';
 interface OrderAttributes {
   id: string;
   user_id?: string;
-  status: string;
-  payment_status: string;
-  payment_method: string;
-  total_amount: string;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  payment_method: PaymentMethod;
+  total_amount: number;
   address: string;
   estimated_delivery?: Date;
   created_at?: Date;
@@ -61,19 +64,19 @@ export default class Order extends Model<OrderAttributes, OrderCreationAttribute
   @Column({
     type: DataType.STRING(30),
     validate: {
-      isIn: [["pending", "confirmed", "out_for_delivery", "delivered", "cancelled"]],
+      isIn: [["pending", "confirmed", "out_for_delivery", "delivered", "cancelled", "rejected"]],
     },
   })
-  status!: string;
+  status!: OrderStatus;
 
   @AllowNull(false)
   @Column({
     type: DataType.STRING(20),
     validate: {
-      isIn: [["paid", "unpaid"]],
+      isIn: [["paid", "unpaid", 'pending_review', 'rejected']],
     },
   })
-  payment_status!: string;
+  payment_status!: PaymentStatus;
 
   @AllowNull(false)
   @Column({
@@ -82,13 +85,13 @@ export default class Order extends Model<OrderAttributes, OrderCreationAttribute
       isIn: [["full", "advance", "cod"]],
     },
   })
-  payment_method!: string;
+  payment_method!: PaymentMethod;
 
   @AllowNull(false)
   @Column({
     type: DataType.DECIMAL(10, 2),
   })
-  total_amount!: string;
+  total_amount!: number;
 
   @AllowNull(false)
   @Column({
