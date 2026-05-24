@@ -18,6 +18,7 @@ import orderRoutes from './routes/order.routes';
 import receiptRoutes from './routes/receipt.routes';
 import complaintRoutes from './routes/complaint.routes';
 import logisticsRoutes from './routes/logistics.routes';
+import paymentAccountRoutes from './routes/payment-account.routes';
 import { authenticate } from './middleware/authenticator';
 import { checkRole, Role } from './middleware/roleChecker';
 import { checkOwnershipOrAdmin } from "./middleware/ownershipOrAdminChecker";
@@ -67,6 +68,7 @@ declare module "express-serve-static-core" {
     app.use('/api/receipts', receiptRoutes);
     app.use('/api/complaints', complaintRoutes);
     app.use('/api/logistics', logisticsRoutes);
+    app.use('/api/payment-accounts', paymentAccountRoutes);
     app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 
     app.use((req, res) => {
