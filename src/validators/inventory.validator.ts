@@ -10,7 +10,10 @@ export const createProductSchema = z.object({
     price: z.coerce.number().min(0),
     quality_label: QualityLableEnum,
     quantity: z.coerce.number().default(0),
-    verified: z.boolean().default(false),
+    verified: z.preprocess((val) => {
+        if (val === "true") return true;
+        if (val === "false") return false;
+    }, z.boolean().default(false)),
     category_id: z.uuid(),
     seller_id: z.uuid(),
     location: z.string().max(255).optional()
@@ -31,7 +34,7 @@ export const getInventorySchema = z.object({
         if (val === "true") return true;
         if (val === "false") return false;
     }, z.boolean().optional()).optional(),
-    search: z.string().trim().min(1).max(100).optional(),
+    search: z.string().trim().max(100).optional(),
     sort: SortEnum.default('created_at'),
     order: OrderEnum.default('desc')
 });
@@ -39,9 +42,9 @@ export const getInventorySchema = z.object({
 export const updateProductSchema = z.object({
     name: z.string().max(255).optional(),
     description: z.string().optional(),
-    price: z.number().min(0).optional(),
+    price: z.coerce.number().min(0).optional(),
     quality_label: QualityLableEnum.optional(),
-    quantity: z.number().optional(),
+    quantity: z.coerce.number().optional(),
     verified: z.boolean().optional(),
     category_id: z.uuid().optional(),
     seller_id: z.uuid().optional(),

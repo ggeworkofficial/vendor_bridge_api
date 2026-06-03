@@ -3,6 +3,7 @@ import AuthService from "../service/auth.service";
 import axios from "axios";
 import { setSessionCookie } from "../helpers/auth";
 import { RegisterBody, LoginBody } from "../validators/auth.validator";
+import userService from '../service/user.service'
 
 export const register = async (req: Request<{}, any, RegisterBody>, res: Response, next: NextFunction) => {
   try {
@@ -15,8 +16,9 @@ export const register = async (req: Request<{}, any, RegisterBody>, res: Respons
     setSessionCookie(res, session_id!);
 
     return res.status(201).json({
+      success: true,
       message: "User registered successfully",
-      data: safeReuslt,
+      user: safeReuslt,
     });
   } catch (error) {
     next(error);
@@ -30,9 +32,22 @@ export const login = async (req: Request<{}, any, LoginBody>, res: Response, nex
     setSessionCookie(res, session_id!);
 
     return res.status(200).json({
+      success: true,
       message: "Login successful",
-      data: safeResult,
+      user: safeResult,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) res.status(403).json({ success: false, message: "Forbidden" });
+    const user = await userService.findOne(userId!);
+    if (!user) res.status(404).json({ success: false, message: "User not found" });
+    return res.status(200).json({ success: true, user });
   } catch (error) {
     next(error);
   }
@@ -41,10 +56,10 @@ export const login = async (req: Request<{}, any, LoginBody>, res: Response, nex
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sessionId = req.cookies?.session_id;
-    if (!sessionId) return res.status(200).json({ message: "Already logged out" });
+    if (!sessionId) return res.status(200).json({ success: true, message: "Already logged out" });
     await AuthService.logout(sessionId);
     res.clearCookie("session_id");
-    return res.status(200).json({ message: "Logged out successfully" });
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     next(error);
   }

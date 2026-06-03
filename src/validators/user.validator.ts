@@ -25,11 +25,17 @@ export const updateSchema = z.object({
 export const getUserSchema = z.object({
     page: z.coerce.number().refine(val => !isNaN(val) && val > 0, { message: "Page must be a positive integer" }).default(1),
     limit: z.coerce.number().refine(val => !isNaN(val) && val > 0 && val <= 100, { message: "Limit must be a positive integer between 1 and 100" }).default(10),
-    role: RoleEnum.default('buyer'),
-    status: StatusEnum.default('active'),
-    search: z.string().min(1).max(100).optional(),
+    role: z.preprocess((val) => {
+            if (!val || val === "") return undefined;
+            return val;
+    }, RoleEnum).optional(),
+    status: z.preprocess((val) => {
+            if (!val || val === "") return undefined;
+            return val;
+    }, StatusEnum).default("active"),  
+    search: z.string().max(100).optional(),
     sort: SortEnum.default("created_at"),
-    order: OrderEnum.default("desc"),
+    order: OrderEnum.default("desc"),   
 });
 
 

@@ -23,8 +23,8 @@ const router = Router();
 router.post("/", authenticate, checkRole("admin"), validate({ body: createUserSchema }), createUser);
 router.get("/", authenticate, checkRole("admin"), validate({ query: getUserSchema }), getUsers);
 router.get("/:id", authenticate, checkOwnershipOrAdmin("id", true), validate({ params: getOneUserSchema }), getUser);
-router.patch("/me/:id", authenticate, checkOwnershipOrAdmin("id", false), validate({ params: getOneUserSchema, body: updateSchema }), updateUser);
-router.patch("/admin/:id", authenticate, checkRole("admin"), validate({ params: getOneUserSchema, body: updateSchema }), updateUser);
+router.put("/:id", authenticate, checkOwnershipOrAdmin("id", false), validate({ params: getOneUserSchema, body: updateSchema }), updateUser);
+router.put("/admin/:id", authenticate, checkRole("admin"), validate({ params: getOneUserSchema, body: updateSchema }), updateUser);
 router.delete("/:id", authenticate, checkOwnershipOrAdmin("id", true), validate({ params: deleteUserSchema }), deleteUser);
 
 export default router;

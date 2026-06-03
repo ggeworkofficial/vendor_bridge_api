@@ -7,7 +7,7 @@ import { CreateUserBody, GetOneUserParams, GetUserQuery, UpdateUserBody } from "
 export const createUser = async (req: Request<{}, any, CreateUserBody>, res: Response, next: NextFunction) => {
   try {
     const user = await userService.create(req.body);
-    return res.status(201).json({ message: "User created", data: user });
+    return res.status(201).json({success: true, message: "User created", data: user });
   } catch (error) {
     next(error);
   }
@@ -17,7 +17,7 @@ export const getUser = async (req: Request<GetOneUserParams>, res: Response, nex
   try {
     const id = req.params.id;
     const user = await userService.findOne(id);
-    return res.status(200).json({ data: user });
+    return res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -37,8 +37,9 @@ export const getUsers = async (req: Request<{}, any, any, any>, res: Response, n
 export const updateUser = async (req: Request<GetOneUserParams, any, UpdateUserBody>, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
-        const user = await userService.update(id, req.body, req.user?.role === "admin");
-        return res.status(200).json({ message: "User updated", data: user });
+        const isAdmin = req.user?.role === "admin";
+        const user = await userService.update(id, req.body, isAdmin);
+        return res.status(200).json({ success: true, message: "User updated", data: user });
 
     } catch (error) {
         next(error);
@@ -49,7 +50,7 @@ export const deleteUser = async (req: Request<GetOneUserParams>, res: Response, 
   try {
     const id = req.params.id;
     await userService.delete(id);
-    return res.status(204).send();
+    return res.status(200).json({ success: true, message: "User deleted" });
   } catch (error) {
     next(error);
   }
