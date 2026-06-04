@@ -23,7 +23,7 @@ export const getPaymentAccount = async (req: Request<GetPaymentAccountParams>, r
   try {
     const params = req.params;
     const account = await paymentAccountService.getPaymentAccount(params);
-    return res.status(200).json({ success: true, data: account });
+    return res.status(200).json(account);
   } catch (error) {
     next(error);
   }

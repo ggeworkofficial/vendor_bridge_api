@@ -10,8 +10,8 @@ const router = Router();
 
 
 router.post('/', authenticate, checkRole('admin'), upload.array('images', 5), validate({body: createProductSchema}), createProduct);
-router.get('/:id', authenticate, validate({params: getProductSchema}), getProduct);
-router.get('/', authenticate, validate({query: getInventorySchema}), getInventory);
+router.get('/:id', validate({params: getProductSchema}), getProduct);
+router.get('/', validate({query: getInventorySchema}), getInventory);
 router.put('/:id', authenticate, checkRole('admin'), validate({params: getProductSchema, body: updateProductSchema}), updateProduct);
 router.delete('/:id', authenticate, checkRole('admin'), validate({params: getProductSchema}), removeProduct);
 

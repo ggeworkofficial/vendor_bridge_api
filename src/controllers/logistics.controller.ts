@@ -31,7 +31,7 @@ export const getLogistics = async (req: Request<GetLogisticsParam>, res: Respons
     if (!user_role) throw createError('Forbidden', 403);
 
     const logistics = await logisticsService.getOne(id, user_id, user_role);
-    return res.status(200).json({ success: true, data: logistics });
+    return res.status(200).json(logistics);
   } catch (error) {
     next(error);
   }
