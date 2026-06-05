@@ -1,4 +1,7 @@
+import { Sequelize } from "sequelize-typescript";
 import { Category } from "../models";
+import { Op } from "sequelize";
+import { PaginationResponse } from "../types/pageination";
 
 interface CreateCategory {
     id: string;
@@ -11,6 +14,14 @@ interface UpdateCategory {
     id: string;
     name?: string;
     updated_at: Date;
+}
+
+interface GetCategoryOprion {
+    page: number;
+    limit: number;
+    sort: 'name' | 'created_at';
+    order: 'asc' | 'desc';
+    search?: string;
 }
 
 export interface CategoryResult {
@@ -28,8 +39,22 @@ export const findCategoryById = async (id: string): Promise<CategoryResult | nul
     return Category.findByPk(id);
 }
 
-export const findAllCategories = async (): Promise<CategoryResult[]> => {
-    return Category.findAll();
+export const findAllCategories = async (options: GetCategoryOprion): Promise<PaginationResponse<CategoryResult>> => {
+   
+    const { rows, count } = await Category.findAndCountAll({
+        limit: options.limit,
+        offset: (options.page - 1) * options.limit,
+        order: [[options.sort, options.order]], 
+        where: options.search ? { name: { [Op.like]: `%${options.search}%` } } : {}
+    });
+    return {
+        data: rows,
+        meta: {
+            page: options.page,
+            limit: options.limit,
+            total: count
+        }
+    };
 }
 
 export const updateCategory = async (id: string, data: UpdateCategory): Promise<CategoryResult | null> => {

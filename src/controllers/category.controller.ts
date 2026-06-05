@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateCategoryBody, GetOneCategoryParams, UpdateCategoryBody } from "../validators/category.validator";
+import { CreateCategoryBody, GetAllCategoriesQuery, GetOneCategoryParams, UpdateCategoryBody } from "../validators/category.validator";
 import CategoryService from "../service/category.service";
 
 
@@ -18,7 +18,7 @@ export const getOneCategory = async (req: Request<GetOneCategoryParams>, res: Re
     try {
         const params = req.params;
         const category = await new CategoryService().getOneCategory(params);
-        return res.status(200).json({success: true, data: category });
+        return res.status(200).json(category);
     } catch (error) {
         next(error);
     }
@@ -26,8 +26,9 @@ export const getOneCategory = async (req: Request<GetOneCategoryParams>, res: Re
 
 export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const categories = await new CategoryService().getAllCategories();
-        return res.status(200).json({success: true, data: categories });
+        const query = (req as any).validated?.query as GetAllCategoriesQuery;
+        const categories = await new CategoryService().getAllCategories(query);
+        return res.status(200).json(categories);
     } catch (error) {
         next(error);
     }

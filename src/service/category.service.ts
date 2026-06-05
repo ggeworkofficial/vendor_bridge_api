@@ -1,8 +1,9 @@
 import { createError } from "../helpers/error";
 import { CategoryResult, CreateCategory, deleteCategory, findAllCategories, findCategoryById, updateCategory } from "../repositories/category.repository";
 import { invalidateCachedProducts } from "../repositories/inventory.repository";
+import { PaginationResponse } from "../types/pageination";
 import { removeUndefined } from "../utils/removeUndefined";
-import { CreateCategoryBody, GetOneCategoryParams, UpdateCategoryBody } from "../validators/category.validator";
+import { CreateCategoryBody, GetOneCategoryParams, GetAllCategoriesQuery, UpdateCategoryBody } from "../validators/category.validator";
 
 
 export default class CategoryService {
@@ -19,8 +20,9 @@ export default class CategoryService {
         return seller;
     }
 
-    async getAllCategories(): Promise<CategoryResult[]> {
-        return await findAllCategories();
+    async getAllCategories(options: GetAllCategoriesQuery): Promise<PaginationResponse<CategoryResult>> {
+        const cleanOptions = removeUndefined(options);
+        return await findAllCategories(cleanOptions);
     }
 
     async updateCategory(data: GetOneCategoryParams & UpdateCategoryBody): Promise<CategoryResult> {
