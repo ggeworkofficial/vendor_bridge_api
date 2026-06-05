@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CreateSellerBody, GetOneSellerParams, UpdateSellerBody } from "../validators/seller.validator";
+import { CreateSellerBody, GetOneSellerParams, GetAllSellersQuery, UpdateSellerBody } from "../validators/seller.validator";
 import SellerService from "../service/seller.service";
 
 export const createSeller = async (req: Request<{}, any, CreateSellerBody>, res: Response, next: NextFunction) => {
@@ -29,7 +29,8 @@ export const getOneSeller = async (req: Request<GetOneSellerParams>, res: Respon
 
 export const getAllSellers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const sellers = await new SellerService().getAllSellers();
+        const query = (req as any).validated?.query as GetAllSellersQuery;
+        const sellers = await new SellerService().getAllSellers(query);
         res.status(200).json(sellers);
     }
     catch (error) {

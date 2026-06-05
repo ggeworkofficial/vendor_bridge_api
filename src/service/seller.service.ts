@@ -2,8 +2,9 @@ import { createError } from "../helpers/error";
 import { invalidateCachedProducts } from "../repositories/inventory.repository";
 import { createSeller, deleteSeller, getAllSellers, getSellerById, SellerCreateResult, SellerResult, updateSeller } from "../repositories/seller.repository";
 import { findUserById } from "../repositories/user.repository";
+import { PaginationResponse } from "../types/pageination";
 import { removeUndefined } from "../utils/removeUndefined";
-import { CreateSellerBody, GetOneSellerParams, UpdateSellerBody } from "../validators/seller.validator";
+import { CreateSellerBody, GetOneSellerParams, GetAllSellersQuery, UpdateSellerBody } from "../validators/seller.validator";
 
 
 export default class SellerService {
@@ -23,8 +24,9 @@ export default class SellerService {
         return seller;
     }
 
-    async getAllSellers(): Promise<SellerResult[]> {
-        return await getAllSellers();
+    async getAllSellers(options: GetAllSellersQuery): Promise<PaginationResponse<SellerResult>> {
+        const cleanOptions = removeUndefined(options);
+        return await getAllSellers(cleanOptions);
     }
 
     async updateSeller(data: GetOneSellerParams & UpdateSellerBody): Promise<SellerCreateResult> {

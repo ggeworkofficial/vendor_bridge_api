@@ -13,6 +13,14 @@ export const getOneSellerSchema = z.object({
     id: z.string().uuid(),
 });
 
+export const getAllSellersSchema = z.object({
+    page: z.coerce.number().min(1).default(1),
+    limit: z.coerce.number().min(1).max(100).default(10),
+    search: z.string().max(255).optional(),
+    sort: z.enum(['name', 'created_at']).default('created_at'),
+    order: z.enum(['asc', 'desc']).default('desc'),
+});
+
 export const updateSellerSchema = z.object({
     user_id: z.uuid().optional(),
     name: z.string().max(255).optional(),
@@ -26,4 +34,5 @@ export const updateSellerSchema = z.object({
 
 export type CreateSellerBody = z.infer<typeof createSellerScehma>;
 export type GetOneSellerParams = z.infer<typeof getOneSellerSchema>;
+export type GetAllSellersQuery = z.infer<typeof getAllSellersSchema>;
 export type UpdateSellerBody = z.infer<typeof updateSellerSchema>;
