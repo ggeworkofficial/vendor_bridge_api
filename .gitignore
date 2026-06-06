@@ -3,4 +3,3 @@ config
 dist
 build
 .env
-uploads
