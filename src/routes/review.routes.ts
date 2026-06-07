@@ -7,10 +7,10 @@ import { createReview, deleteReview, getAllReviews, getReview, updateReview } fr
 
 const router = Router();
 
-router.post("/:id", authenticate, checkOwnershipOrAdmin("id", false), validate({params: getReviewSchema, body: createReviewSchema}), createReview);
+router.post("/", authenticate, validate({body: createReviewSchema}), createReview);
 router.get("/:id", authenticate, validate({params: getReviewSchema}), getReview);
 router.get("/", authenticate, validate({query: getReviewsSchema}), getAllReviews);
-router.put("/:id", authenticate, checkOwnershipOrAdmin("id", false), validate({params: getReviewSchema, body: updateReviewSchema, query: getReviewSchema}), updateReview);
-router.delete("/:id", authenticate, checkOwnershipOrAdmin("id"), validate({params: getReviewSchema, query: getReviewSchema}), deleteReview);
+router.put("/:id", authenticate, validate({params: getReviewSchema, body: updateReviewSchema}), updateReview);
+router.delete("/:id", authenticate, validate({params: getReviewSchema}), deleteReview);
 
 export default router;

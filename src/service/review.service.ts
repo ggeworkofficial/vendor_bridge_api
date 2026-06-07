@@ -6,6 +6,7 @@ import { removeUndefined } from '../utils/removeUndefined';
 import { ReviewResult } from '../repositories/review.repository';
 import { createError } from '../helpers/error';
 import { deleteCachedProduct, invalidateCachedProducts } from '../repositories/inventory.repository';
+import { Role } from '../middleware/roleChecker';
 
 type CreateReviewOption = CreateReviewBody & {
     user_id: string;
@@ -37,19 +38,23 @@ export class ReviewService {
         return await getReviews(cleanPayload);
     }
 
-    async update(id: GetReviewParam['id'], data: UpdateReviewBody): Promise<ReviewResult> {
+    async update(id: GetReviewParam['id'], data: UpdateReviewBody, user_id: string): Promise<ReviewResult> {
         const updateData = {
             ...data,
             updated_at: new Date()
         };
         const cleanData = removeUndefined(updateData)
         const review = await updateReview(id, cleanData);
+        if (review && review.user?.id !== user_id) throw createError("Forbidden", 403);
         if (!review) throw createError("Review not found", 404);
         await invalidateCachedProducts();
         return review;
     }
 
-    async remove(id: GetReviewParam['id']): Promise<boolean> {
+    async remove(id: GetReviewParam['id'], user_id: string, role: Role): Promise<boolean> {
+        const getReview = await this.getOne(id);
+        if (getReview.user?.id !== user_id && role !== "admin") throw createError("Forbidden", 403);
+        
         const success = await deleteReview(id);
         if (!success) throw createError("Review not found", 404);
         await invalidateCachedProducts();
