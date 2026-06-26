@@ -1,6 +1,14 @@
 import z from "zod";
 
-const RoleEnum = z.enum(["admin", "buyer", "contributor"]);
+const RoleEnum = z.enum([
+    "admin", 
+    "buyer", 
+    "contributor", 
+    "reseller",
+    "service_provider",
+    "bulk_buyer",
+    "seller",
+]);
 const StatusEnum = z.enum(["active", "suspended"]);
 const SortEnum = z.enum(["full_name", "email", "created_at"]);
 const OrderEnum = z.enum(["asc", "desc"]);

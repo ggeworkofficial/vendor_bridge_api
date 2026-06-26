@@ -76,7 +76,15 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
   @Column({
     type: DataType.STRING(20),
     validate: {
-      isIn: [["buyer", "contributor", "admin"]],
+      isIn: [[
+        "buyer", 
+        "contributor", 
+        "admin", 
+        "reseller",
+        "service_provider",
+        "bulk_buyer",
+        "seller",
+      ]],
     },
   })
   role!: string;
