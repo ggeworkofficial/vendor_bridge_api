@@ -5,6 +5,7 @@ import SellerApplication from "../models/seller-application.model";
 import ResellerApplication from "../models/reseller-application.model";
 import ResellerShare from "../models/reseller-share.model";
 import ResellerClick from "../models/reseller-click.model";
+import ResellerPayout from "../models/reseller-payout.model";
 
 class Postgres {
   private static instance: Sequelize;
@@ -41,7 +42,8 @@ class Postgres {
           SellerApplication, 
           ResellerApplication, 
           ResellerShare, 
-          ResellerClick
+          ResellerClick,
+          ResellerPayout,
         ],
       });
     }
