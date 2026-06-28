@@ -1,6 +1,10 @@
 // src/config/database.ts
 import { Sequelize } from "sequelize-typescript";
 import { Category, PaymentAccount, Setting, User, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage } from "../models";
+import SellerApplication from "../models/seller-application.model";
+import ResellerApplication from "../models/reseller-application.model";
+import ResellerShare from "../models/reseller-share.model";
+import ResellerClick from "../models/reseller-click.model";
 
 class Postgres {
   private static instance: Sequelize;
@@ -17,7 +21,28 @@ class Postgres {
         password: process.env.DB_PASSWORD!,
         dialect: "postgres",
         logging: false,
-        models: [User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage],
+        models: [
+          User, 
+          Category, 
+          PaymentAccount, 
+          Setting,
+          Seller, 
+          Cart, 
+          Complaint, 
+          Inventory, 
+          ProductImage, 
+          Review, 
+          CartItem, 
+          Order, 
+          OrderItem, 
+          Receipt, 
+          Logistics, 
+          ComplaintMessage, 
+          SellerApplication, 
+          ResellerApplication, 
+          ResellerShare, 
+          ResellerClick
+        ],
       });
     }
 
