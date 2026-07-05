@@ -32,8 +32,6 @@ interface ResellerApplicationAttributes {
   status: string;
   rejection_reason?: string;
   admin_notes?: string;
-  commission_rate: number;
-  total_earnings: number;
   created_at: Date;
   updated_at: Date;
 }
@@ -44,8 +42,6 @@ interface ResellerApplicationCreationAttributes
     | "status"
     | "rejection_reason"
     | "admin_notes"
-    | "commission_rate"
-    | "total_earnings"
     | "created_at"
     | "updated_at"
   > {}
@@ -138,20 +134,6 @@ export default class ResellerApplication
     type: DataType.TEXT,
   })
   admin_notes?: string;
-
-  @AllowNull(false)
-  @Default(0.0)
-  @Column({
-    type: DataType.DECIMAL(5, 2),
-  })
-  commission_rate!: number;
-
-  @AllowNull(false)
-  @Default(0.0)
-  @Column({
-    type: DataType.DECIMAL(10, 2),
-  })
-  total_earnings!: number;
 
   @CreatedAt
   @Column({
