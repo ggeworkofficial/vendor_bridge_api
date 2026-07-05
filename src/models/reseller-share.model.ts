@@ -12,8 +12,8 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
-import User from "./user.model";
 import Inventory from "./inventory.model";
+import Reseller from "./reseller.model";
 
 interface ResellerShareAttributes {
   id: string;
@@ -58,7 +58,7 @@ export default class ResellerShare
   })
   id!: string;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Reseller)
   @AllowNull(false)
   @Column({
     type: DataType.UUID,
@@ -111,8 +111,8 @@ export default class ResellerShare
   })
   updated_at!: Date;
 
-  @BelongsTo(() => User)
-  reseller?: User;
+  @BelongsTo(() => Reseller)
+  reseller?: Reseller;
 
   @BelongsTo(() => Inventory)
   product?: Inventory;
