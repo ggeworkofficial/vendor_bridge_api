@@ -1,0 +1,758 @@
+openapi: 3.0.0
+info:
+  title: Vendor Bridge
+  version: 1.0.0
+  description: ''
+servers:
+  - url: http://localhost:5000
+paths:
+  /api/auth/login:
+    post:
+      summary: login admin
+      responses: {}
+      tags:
+        - Authentication APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            example: "{\r\n    // \"full_name\": \"Ezana Tadesse\",\r\n    \"email\": \"kingezana67@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"enject\": \"<script>consol.log(hacked)<script>\"\r\n}"
+  /api/auth/register:
+    post:
+      summary: register
+      responses: {}
+      tags:
+        - Authentication APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: utc-millisec
+            example:
+              full_name: Ezana Tadesse
+              email: ezanatadesse2003@gmail.com
+              password: '12345678'
+  /api/test:
+    get:
+      summary: Authentication
+      responses: {}
+      tags:
+        - Authentication APIs
+  /api/test/867f28de-5509-4ad0-9c8d-179aa3b58853:
+    get:
+      summary: Authentication Copy
+      responses: {}
+      tags:
+        - Authentication APIs
+  /api/auth/logout:
+    delete:
+      summary: logout
+      responses: {}
+      tags:
+        - Authentication APIs
+  /api/auth/me:
+    get:
+      summary: Get me
+      responses: {}
+      tags:
+        - Authentication APIs
+  /api/users:
+    post:
+      summary: Create a new user
+      responses: {}
+      tags:
+        - User APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: utc-millisec
+            example:
+              full_name: Test User
+              email: testuser@gmail.com
+              password: '12345678'
+    get:
+      summary: Get users
+      responses: {}
+      tags:
+        - User APIs
+  /api/users/8f16b102-63f7-4975-84ce-70f24356037a:
+    put:
+      summary: Update User
+      responses: {}
+      tags:
+        - User APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+            example:
+              full_name: Test User
+              email: testuser@gmail.com
+    get:
+      summary: Get User
+      responses: {}
+      tags:
+        - User APIs
+  /api/users/admin/8f16b102-63f7-4975-84ce-70f24356037a:
+    put:
+      summary: Update user(for admin)
+      responses: {}
+      tags:
+        - User APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+            example:
+              status: active
+  /api/users/e75fcb20-d275-4cf8-a0c0-b0dd1c7ea929:
+    delete:
+      summary: Delete User
+      responses: {}
+      tags:
+        - User APIs
+  /api/categories:
+    post:
+      summary: Create new category
+      responses: {}
+      tags:
+        - Category APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            example:
+              name: Electronics
+    get:
+      summary: Get categories
+      responses: {}
+      tags:
+        - Category APIs
+  /api/categories/871db588-20f4-47b2-99e4-de23382e2493:
+    get:
+      summary: Get category
+      responses: {}
+      tags:
+        - Category APIs
+    put:
+      summary: Update category
+      responses: {}
+      tags:
+        - Category APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            example:
+              name: Home & Living
+  /api/categories/5002f75c-304d-43cb-8ccf-eca5ae6c3713:
+    delete:
+      summary: Delete category
+      responses: {}
+      tags:
+        - Category APIs
+  /api/sellers:
+    post:
+      summary: Create seller
+      responses: {}
+      tags:
+        - Seller APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                name:
+                  type: string
+            example:
+              user_id: c07e8e77-c03a-4c11-883b-1cc74ee8d43e
+              name: Zex's supplying PLC
+    get:
+      summary: Get sellers
+      responses: {}
+      tags:
+        - Seller APIs
+  /api/sellers/de9d1947-4079-4f78-9ca6-feacac35a1f0:
+    put:
+      summary: Update seller
+      responses: {}
+      tags:
+        - Seller APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                contact:
+                  type: string
+                  format: utc-millisec
+                verified:
+                  type: boolean
+            example:
+              location: AA, Ayer Tena
+              contact: '+251911256060'
+              verified: true
+    get:
+      summary: Get seller
+      responses: {}
+      tags:
+        - Seller APIs
+  /api/sellers/:
+    delete:
+      summary: Delete seller
+      responses: {}
+      tags:
+        - Seller APIs
+  /api/inventory:
+    post:
+      summary: Create product
+      responses: {}
+      tags:
+        - Product APIs
+    get:
+      summary: Get products
+      responses: {}
+      tags:
+        - Product APIs
+  /api/inventory/cfe2753e-9a75-409c-bc4a-61eb998fcc62:
+    get:
+      summary: Get product
+      responses: {}
+      tags:
+        - Product APIs
+  /api/inventory/b62a55a4-7b06-4676-b2fd-e0a4c0575f09:
+    put:
+      summary: Update product
+      responses: {}
+      tags:
+        - Product APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+            example:
+              quantity: 40
+  /api/inventory/1115c951-b37d-4b86-a774-811116cc0d5e:
+    delete:
+      summary: Delete product
+      responses: {}
+      tags:
+        - Product APIs
+  /api/product-images:
+    post:
+      summary: Create Product Image
+      responses: {}
+      tags:
+        - Product Image APIs
+    get:
+      summary: Get Product images
+      parameters:
+        - name: product_id
+          in: query
+          schema:
+            type: string
+          example: b62a55a4-7b06-4676-b2fd-e0a4c0575f09
+      responses: {}
+      tags:
+        - Product Image APIs
+  /api/product-images/9cef1526-c6a0-4c85-b1f1-ecc0df2685f4:
+    get:
+      summary: Get Product image
+      responses: {}
+      tags:
+        - Product Image APIs
+    put:
+      summary: Update Product image
+      responses: {}
+      tags:
+        - Product Image APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_primary:
+                  type: boolean
+            example:
+              is_primary: true
+  /api/product-images/f8f51ef6-ba53-4082-b9c5-a9d855502012:
+    delete:
+      summary: Delete Product image
+      responses: {}
+      tags:
+        - Product Image APIs
+  /api/reviews:
+    post:
+      summary: Create review
+      responses: {}
+      tags:
+        - Review APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: string
+                rating:
+                  type: integer
+                comment:
+                  type: string
+            example:
+              product_id: b62a55a4-7b06-4676-b2fd-e0a4c0575f09
+              rating: 3
+              comment: A very not bad product and to be honest i am speachless
+    get:
+      summary: Get reviews
+      parameters:
+        - name: product_id
+          in: query
+          schema:
+            type: string
+          example: b62a55a4-7b06-4676-b2fd-e0a4c0575f09
+      responses: {}
+      tags:
+        - Review APIs
+  /api/reviews/85e891a8-9bca-4a12-8e02-cd3aedf794a9:
+    get:
+      summary: Get review
+      responses: {}
+      tags:
+        - Review APIs
+    put:
+      summary: Update review
+      responses: {}
+      tags:
+        - Review APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                comment:
+                  type: string
+            example:
+              rating: 3
+              comment: Yooooo
+    delete:
+      summary: Delete review
+      responses: {}
+      tags:
+        - Review APIs
+  /api/orders:
+    post:
+      summary: Create order
+      responses: {}
+      tags:
+        - Order APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: string
+                      quantity:
+                        type: integer
+                payment_method:
+                  type: string
+                address:
+                  type: string
+            example:
+              products:
+                - product_id: cfe2753e-9a75-409c-bc4a-61eb998fcc62
+                  quantity: 2
+              payment_method: full
+              address: Addis Ababa, bole
+    get:
+      summary: Get orders
+      responses: {}
+      tags:
+        - Order APIs
+  /api/orders/b65a4c70-c435-49fa-8bb3-18d322c3c138:
+    put:
+      summary: Update order
+      responses: {}
+      tags:
+        - Order APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+            example:
+              status: confirmed
+    get:
+      summary: Get order
+      responses: {}
+      tags:
+        - Order APIs
+  /api/receipts:
+    post:
+      summary: Create receipt
+      responses: {}
+      tags:
+        - Receipt APIs
+    get:
+      summary: Get receipts
+      responses: {}
+      tags:
+        - Receipt APIs
+  /api/receipts/509e36dc-4ebd-469d-81ab-553e65465197:
+    get:
+      summary: Get receipt
+      responses: {}
+      tags:
+        - Receipt APIs
+    put:
+      summary: Update receipt
+      responses: {}
+      tags:
+        - Receipt APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                note:
+                  type: string
+            example:
+              status: approved
+              note: Perfect
+  /api/complaints:
+    post:
+      summary: Create complaint
+      responses: {}
+      tags:
+        - Complaint APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                subject:
+                  type: string
+                description:
+                  type: string
+            example:
+              order_id: dd51353e-4fcd-4e4e-af41-043b90e4e1e7
+              subject: Test complaint
+              description: This is a test complaint
+    get:
+      summary: Get complaints
+      parameters:
+        - name: order_id
+          in: query
+          required: false
+          deprecated: false
+          schema: {}
+          example: e3360cd5-2c03-43f7-9fa8-786bbf1e7125
+      responses: {}
+      tags:
+        - Complaint APIs
+  /api/complaints/82782349-0c5e-4573-931f-b726916453b5:
+    get:
+      summary: Get complaint
+      responses: {}
+      tags:
+        - Complaint APIs
+  /api/complaints/1b617e79-de28-4065-8dc5-81358839c33b:
+    put:
+      summary: Update complaint
+      responses: {}
+      tags:
+        - Complaint APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+            example: "{\r\n    \"status\": \"resolved\"\r\n    // \"priority\": \"medium\"\r\n}"
+  /api/complaints/messages:
+    post:
+      summary: Create complaint msg
+      responses: {}
+      tags:
+        - Complaint APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                complaint_id:
+                  type: string
+                message:
+                  type: string
+            example:
+              complaint_id: 82782349-0c5e-4573-931f-b726916453b5
+              message: This is a replay to test complaint
+    get:
+      summary: Get complaint msgs
+      parameters:
+        - name: complaint_id
+          in: query
+          schema:
+            type: string
+          example: 82782349-0c5e-4573-931f-b726916453b5
+      responses: {}
+      tags:
+        - Complaint APIs
+  /api/complaints/messages/2b1363cb-7255-413b-9a3f-ac5ebbf81910:
+    get:
+      summary: Get complaint msg
+      responses: {}
+      tags:
+        - Complaint APIs
+  /api/logistics:
+    post:
+      summary: Create logistic
+      responses: {}
+      tags:
+        - Logistics APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                carrier:
+                  type: string
+                tracking_number:
+                  type: string
+                origin:
+                  type: string
+                destination:
+                  type: string
+                estimated_eta:
+                  type: string
+                  format: date
+            example:
+              order_id: 5f99ad61-dc44-49d8-87ce-a1dc0252a0c6
+              carrier: DHL Express
+              tracking_number: DHL29293946
+              origin: Keral
+              destination: Portland, OR
+              estimated_eta: '2026-04-15'
+    get:
+      summary: Get logistics
+      responses: {}
+      tags:
+        - Logistics APIs
+  /api/logistics/4a71e797-ee56-49e9-850f-411e2b79468e:
+    get:
+      summary: Get logistic
+      responses: {}
+      tags:
+        - Logistics APIs
+  /api/logistics/6afa9576-fc75-4f9d-8b23-d2f6aecf84f4:
+    put:
+      summary: Update logistic
+      responses: {}
+      tags:
+        - Logistics APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                estimated_eta:
+                  type: string
+                  format: date
+            example:
+              status: delivered
+              estimated_eta: '2026-06-15'
+  /api/payment-accounts:
+    post:
+      summary: Create payment account
+      responses: {}
+      tags:
+        - Payment Account APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                label:
+                  type: string
+                account_name:
+                  type: string
+                account_number:
+                  type: string
+                  format: utc-millisec
+            example:
+              type: bank
+              label: CBE bank
+              account_name: Vendor bridge trading plc
+              account_number: '10000349493939'
+    get:
+      summary: Get payment accounts
+      responses: {}
+      tags:
+        - Payment Account APIs
+  /api/payment-accounts/22a7ca52-b1e4-41b7-b63c-165569c16f56:
+    get:
+      summary: Get payment account
+      responses: {}
+      tags:
+        - Payment Account APIs
+    put:
+      summary: Update payment account
+      responses: {}
+      tags:
+        - Payment Account APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_number:
+                  type: string
+                  format: utc-millisec
+            example:
+              account_number: '1000494029303340'
+  /api/settings:
+    post:
+      summary: Create setting
+      responses: {}
+      tags:
+        - Settings APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                value:
+                  type: object
+                  properties:
+                    timeout:
+                      type: integer
+                    description:
+                      type: string
+                description:
+                  type: string
+                is_public:
+                  type: boolean
+            example:
+              key: payment_timeout_seconds
+              value:
+                timeout: 300
+                description: Time allowed for payment confirmation before order is flagged
+              description: Internal system rule for payment expiration logic
+              is_public: false
+  /api/settings/public/payment_timeout_seconds:
+    get:
+      summary: Get setting
+      responses: {}
+      tags:
+        - Settings APIs
+  /api/settings/public:
+    get:
+      summary: Get settings
+      responses: {}
+      tags:
+        - Settings APIs
+  /api/settings/payment_timeout_seconds:
+    put:
+      summary: Update setting
+      responses: {}
+      tags:
+        - Settings APIs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: object
+                  properties:
+                    timeout:
+                      type: integer
+                    description:
+                      type: string
+            example:
+              value:
+                timeout: 280
+                description: Time allowed for payment confirmation before order is flagged
