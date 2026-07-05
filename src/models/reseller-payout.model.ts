@@ -12,7 +12,7 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import { Optional } from "sequelize";
-import User from "./user.model";
+import Reseller from "./reseller.model";
 
 interface ResellerPayoutAttributes {
   id: string;
@@ -60,7 +60,7 @@ export default class ResellerPayout
   })
   id!: string;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => Reseller)
   @AllowNull(false)
   @Column({
     type: DataType.UUID,
@@ -131,6 +131,6 @@ export default class ResellerPayout
   })
   updated_at!: Date;
 
-  @BelongsTo(() => User)
-  reseller?: User;
+  @BelongsTo(() => Reseller)
+  reseller?: Reseller;
 }
