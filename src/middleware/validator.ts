@@ -33,12 +33,14 @@ export const validate = (schemas: Schema): RequestHandler => {
       console.error("🔥 CONSTRUCTOR:", (err as any)?.constructor?.name);
       if (err instanceof ZodError) {
         return res.status(400).json({
+          success: false,
           message: "Validation error",
           errors: err.issues.map((e) => e.message),
         });
       }
 
       return res.status(400).json({
+        success: false,
         message: "Validation error",
         errors: ["Unknown validation error"],
       });

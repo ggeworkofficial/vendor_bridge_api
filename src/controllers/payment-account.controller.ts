@@ -62,7 +62,7 @@ export const deletePaymentAccount = async (req: Request<GetPaymentAccountParams>
     if (!user_role) throw createError("Forbidden", 403);
 
     const success = await paymentAccountService.deletePaymentAccount(user_role, params);
-    return res.status(204).send({ success, message: "Payment account deleted" });
+    return res.status(200).send({ success, message: "Payment account deleted" });
   } catch (error) {
     next(error);
   }

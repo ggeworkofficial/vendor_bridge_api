@@ -8,7 +8,7 @@ import { createSeller, deleteSeller, getAllSellers, getOneSeller, updateSeller }
 const router = Router();
 
 
-router.post('/', authenticate, checkRole('admin'), validate({body: createSellerScehma}),  createSeller)
+router.post('/', authenticate, checkRole('admin'), validate({body: createSellerScehma}),  createSeller);
 router.get('/:id', authenticate, validate({params: getOneSellerSchema}), getOneSeller);
 router.get('/', authenticate, validate({query: getAllSellersSchema}), getAllSellers);
 router.put('/:id', authenticate, checkRole('admin'), validate({params: getOneSellerSchema,  body: updateSellerSchema}), updateSeller);

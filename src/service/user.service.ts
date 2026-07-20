@@ -15,6 +15,7 @@ import { User } from "../models";
 import { CreateUserBody, DeleteUserParams, GetUserQuery, UpdateUserBody } from "../validators/user.validator";
 import { removeUndefined } from "../utils/removeUndefined";
 import { clearSessionsForUser, removeSession } from "../repositories/auth.repository";
+import { file } from "zod";
 
 interface PaginationResult<T> {
   data: T[];
@@ -69,7 +70,8 @@ class UserService {
   }
 
   async findAll(options: GetUserQuery): Promise<PaginationResult<UserResult>> {
-    const result = await findUsers(options);
+    const cleanOptions = removeUndefined(options)
+    const result = await findUsers(cleanOptions);
     return {
       data: result.rows.map((user) => this.sanitizeUser(user)),
       meta: {
@@ -86,9 +88,10 @@ class UserService {
       throw createError("User not found", 404);
     }
 
-    const restrictedFileds = ['role', 'status'];
+    const userOnlyUpdate = ['email', 'full_name'];
+    const adminOnlyUpdate = ['role', 'status'];
     if (!adminUpdate) {
-      for (const field of restrictedFileds) {
+      for (const field of adminOnlyUpdate) {
         if (field in payload) {
           throw createError(`Unauthorized update fields`, 403);
         }
@@ -98,6 +101,13 @@ class UserService {
         if (existing) {
           throw createError("Email already registered", 409);
         }
+      }
+    }
+
+    if (adminOnlyUpdate) {
+      for (const field of userOnlyUpdate) {
+        if (field in payload) 
+          throw createError(`Admin cant update ${field}`, 403);
       }
     }
 
