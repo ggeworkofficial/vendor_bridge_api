@@ -66,6 +66,23 @@ export const getOrders = async (req: Request<{}, any, {}, any>, res: Response, n
     }
 }
 
+export const getMyOrders = async (req: Request<{}, any, {}, any>, res: Response, next: NextFunction) => {
+    const transaction = await Postgres.getInstance().transaction();
+    const userId = req.user?.id;
+    const payload = (req as any).validated?.query as GetOrdersForAdminQuery;
+    try {
+        if (!userId) throw createError('Forbidden', 403);
+
+        const orders = await orderService.getMyOrders(payload, userId, transaction);
+        res.status(200).json(orders);
+        await transaction.commit();
+
+    } catch(error) {
+        await transaction.rollback();
+        next(error);
+    }
+}
+
 export const updateOrder = async (req: Request<GetOrderParam, any, UpdateOrderBody, any>, res: Response, next: NextFunction) => {
     const transaction = await Postgres.getInstance().transaction();
     const body = req.body;

@@ -81,6 +81,12 @@ export class OrderService {
         return orders;
     }
 
+    async getMyOrders(payload: GetOrdersForAdminQuery, user_id: string, transaction: Transaction): Promise<PaginationResponse<OrderResult>> {
+        const cleanPayload = removeUndefined(payload);
+        const orders = await getOrders(cleanPayload, transaction, user_id);
+        return orders;
+    }
+
     async update(id: string, user_id: string, role: Role, payload: UpdateOrderBody, transaction: Transaction): Promise<OrderResult> {
         const order = await getOrder(id, transaction);
         

@@ -8,7 +8,7 @@ export const createSeller = async (req: Request<{}, any, CreateSellerBody>, res:
         const seller = await new SellerService().createSeller(body);
         res.status(201).json({
             success: true,
-            message: "category created",
+            message: "seller created",
             data: seller
         });
     } catch (error) {
@@ -45,7 +45,7 @@ export const updateSeller = async (req: Request<GetOneSellerParams, any, UpdateS
         const seller = await new SellerService().updateSeller({ ...params, ...body });
         res.status(200).json({
             success: true,
-            message: "category modified",
+            message: "seller modified",
             data: seller
         });
     } catch (error) {
@@ -57,7 +57,7 @@ export const deleteSeller = async (req: Request<GetOneSellerParams>, res: Respon
     try {
         const params = req.params;
         const success = await new SellerService().deleteSeller(params);
-        res.status(204).send({
+        res.status(200).send({
             success,
             message: "Seller removed"
         });

@@ -10,7 +10,7 @@ export const createSellerScehma = z.object({
 });
 
 export const getOneSellerSchema = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
 });
 
 export const getAllSellersSchema = z.object({

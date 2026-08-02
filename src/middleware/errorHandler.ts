@@ -4,6 +4,7 @@ export const errorHandler = (error: any, req: Request, res: Response, next: Next
     console.error("Error:", error);
 
     res.status(error.status || 500).json({
+        success: false,
         message: error.message || "Internal Server Error",
     });
 }

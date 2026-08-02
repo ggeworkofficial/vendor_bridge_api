@@ -49,7 +49,7 @@ export const deleteCategory = async (req: Request<GetOneCategoryParams>, res: Re
     try {
         const params = req.params;
         const success = await new CategoryService().deleteCategory(params);
-        return res.status(204).send({
+        return res.status(200).send({
             success,
             message: "Category removed"
         });

@@ -13,7 +13,8 @@ export default class SellerService {
         const created_at = new Date();
         const updated_at = new Date();
         const user = await findUserById(data.user_id);
-        if (!user || user.role != 'contributor') throw createError('Invalid user type', 400);
+        const allowed = ['contributor', 'admin'];
+        if (!user || !allowed.includes(user.role)) throw createError('Invalid user type', 400);
         const cleanSeller = removeUndefined({ id, ...data, created_at, updated_at })
         return await createSeller(cleanSeller);
     }
