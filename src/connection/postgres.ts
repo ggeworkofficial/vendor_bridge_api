@@ -47,17 +47,15 @@ class Postgres {
           ResellerShare, 
           ResellerClick,
           ResellerPayout,
-<<<<<<< HEAD
+
           Listing, 
           ListingMedia, 
           ListingPriceTier, 
           Follow, 
           Referral, 
-          Withdrawal
-=======
+          Withdrawal,
           Reseller,
           ResellerCommission
->>>>>>> a60446b (Added reseller and reseller-commission schemas and models.)
         ],
       });
     }

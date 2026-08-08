@@ -14,22 +14,18 @@ import {
 import { Optional } from "sequelize";
 import User from "./user.model";
 
-export interface SocialMediaAccount {
-  platform: string;
-  username: string;
-  url: string;
-}
 
+export type ResellerApplicationStatus = "pending" | "approved" | "rejected" | "suspended";
 interface ResellerApplicationAttributes {
   id: string;
   user_id: string;
   full_name: string;
   email: string;
   phone: string;
-  social_media_accounts: SocialMediaAccount[];
+  social_media_accounts: Record<string, string>[];
   marketing_experience: string;
   preferred_categories: string[];
-  status: string;
+  status: ResellerApplicationStatus;
   rejection_reason?: string;
   admin_notes?: string;
   created_at: Date;
@@ -96,7 +92,7 @@ export default class ResellerApplication
   @Column({
     type: DataType.JSON,
   })
-  social_media_accounts!: SocialMediaAccount[];
+  social_media_accounts!: Record<string, string>[];
 
   @AllowNull(false)
   @Column({
@@ -123,7 +119,7 @@ export default class ResellerApplication
       ]],
     },
   })
-  status!: string;
+  status!: ResellerApplicationStatus;
 
   @Column({
     type: DataType.TEXT,
