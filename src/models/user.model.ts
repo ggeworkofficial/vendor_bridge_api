@@ -17,6 +17,7 @@ import Cart from "./cart.model";
 import Order from "./order.model";
 import Review from "./review.model";
 import Complaint from "./complaint.model";
+import UserRole from "./user-role.model";
 import { Optional } from "sequelize";
 
 interface UserAttributes {
@@ -131,4 +132,7 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
 
   @HasMany(() => Review)
   reviews?: Review[];
+
+  @HasMany(() => UserRole)
+  userRoles?: UserRole[];
 }

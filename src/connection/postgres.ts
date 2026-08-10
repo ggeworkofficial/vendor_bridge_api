@@ -1,6 +1,6 @@
 // src/config/database.ts
 import { Sequelize } from "sequelize-typescript";
-import { Category, PaymentAccount, Setting, User, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage, Listing, ListingMedia, ListingPriceTier, Follow, Referral, Withdrawal } from "../models";
+import { Category, PaymentAccount, Setting, User, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage, Listing, ListingMedia, ListingPriceTier, Follow, Referral, Withdrawal, Role, UserRole, Permission, RolePermission } from "../models";
 import SellerApplication from "../models/seller-application.model";
 import ResellerApplication from "../models/reseller-application.model";
 import ResellerShare from "../models/reseller-share.model";
@@ -55,7 +55,11 @@ class Postgres {
           Referral, 
           Withdrawal,
           Reseller,
-          ResellerCommission
+          ResellerCommission,
+          Role,
+          UserRole,
+          Permission,
+          RolePermission
         ],
       });
     }

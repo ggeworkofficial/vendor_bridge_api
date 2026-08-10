@@ -20,5 +20,9 @@ import ListingPriceTier from "./listing-price-tier.model";
 import Follow from "./follow.model";
 import Referral from "./referral.model";
 import Withdrawal from "./withdrawal.model";
+import Role from "./role.model";
+import UserRole from "./user-role.model";
+import Permission from "./permission.model";
+import RolePermission from "./role-permission.model";
 
-export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage, Listing, ListingMedia, ListingPriceTier, Follow, Referral, Withdrawal };
+export { User, Category, PaymentAccount, Setting, Seller, Cart, Complaint, Inventory, ProductImage, Review, CartItem, Order, OrderItem, Receipt, Logistics, ComplaintMessage, Listing, ListingMedia, ListingPriceTier, Follow, Referral, Withdrawal, Role, UserRole, Permission, RolePermission };
