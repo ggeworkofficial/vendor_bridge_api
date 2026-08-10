@@ -1,7 +1,6 @@
-import { WhenOptions } from "joi";
 import Reseller from "../models/reseller.model";
 import { PaginationResponse } from "../types/pageination";
-import { Op, Transaction } from "sequelize";
+import { Op, Transaction, WhereOptions } from "sequelize";
 
 export type ResellerBase = {
     id: string,
@@ -44,7 +43,7 @@ export const getResellerById = async (id: string): Promise<ResellerBase | null> 
 export const getResellers = async (payload: GetResellersPayload): Promise<PaginationResponse<ResellerBase>> => {
     const { page, limit, search, sort, order } = payload;
     const offset = (page - 1) * limit;
-    const where: WhenOptions<any> = {};
+    const where: WhereOptions<any> = {};
 
     if (search) {
         Object.assign(where, {
