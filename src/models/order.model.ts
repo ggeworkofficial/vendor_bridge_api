@@ -30,6 +30,7 @@ interface OrderAttributes {
   payment_method: PaymentMethod;
   total_amount: number;
   address: string;
+  referral_code?: string | null;
   estimated_delivery?: Date;
   created_at?: Date;
   updated_at?: Date;
@@ -98,6 +99,11 @@ export default class Order extends Model<OrderAttributes, OrderCreationAttribute
     type: DataType.TEXT,
   })
   address!: string;
+
+  @Column({
+    type: DataType.STRING(16),
+  })
+  referral_code?: string | null;
 
   @Column({
     type: DataType.DATE,

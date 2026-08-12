@@ -20,10 +20,15 @@ import complaintRoutes from './routes/complaint.routes';
 import logisticsRoutes from './routes/logistics.routes';
 import paymentAccountRoutes from './routes/payment-account.routes';
 import settingsRoutes from './routes/settings.routes';
+import listingRoutes from './routes/listing.routes';
+import followRoutes from './routes/follow.routes';
+import referralRoutes from './routes/referral.routes';
+import withdrawalRoutes from './routes/withdrawal.routes';
 import { authenticate } from './middleware/authenticator';
 import { checkRole, Role } from './middleware/roleChecker';
 import { checkOwnershipOrAdmin } from "./middleware/ownershipOrAdminChecker";
 import path from 'path';
+import { initCronJobs } from './service/cron.service';
 
 
 dotenv.config();
@@ -52,6 +57,9 @@ declare module "express-serve-static-core" {
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
     await Postgres.connect();
+    
+    // Initialize scheduled jobs
+    initCronJobs();
 
     //routes here
     app.get("/api/test/:id", authenticate, checkOwnershipOrAdmin(), (req: express.Request, res: express.Response) => {
@@ -71,6 +79,10 @@ declare module "express-serve-static-core" {
     app.use('/api/logistics', logisticsRoutes);
     app.use('/api/payment-accounts', paymentAccountRoutes);
     app.use('/api/settings', settingsRoutes);
+    app.use('/api/listings', listingRoutes);
+    app.use('/api/follows', followRoutes);
+    app.use('/api', referralRoutes); // Handles /api/wallet and /api/referrals
+    app.use('/api/withdrawals', withdrawalRoutes);
     app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 
     app.use((req, res) => {

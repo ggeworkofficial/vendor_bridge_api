@@ -6,8 +6,10 @@ export type OrderItemBase = {
     id: string,
     order_id: string,
     product_id: string,
+    listing_id?: string | null,
     quantity: number,
     price: number,
+    unit_price: number,
     created_at: Date,
     updated_at: Date,
 };

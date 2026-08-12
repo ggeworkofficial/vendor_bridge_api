@@ -21,7 +21,8 @@ export const findUserById = async (id: string) => {
 };
 
 export const createUser = async (payload: CreateUserPayload) => {
-  return User.create(payload);
+  const ref_code = Math.random().toString(36).substring(2, 9).toUpperCase();
+  return User.create({ ...payload, ref_code });
 };
 
 export const getUserRole = async (userId: string) => {

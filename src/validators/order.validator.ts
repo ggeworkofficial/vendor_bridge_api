@@ -8,11 +8,13 @@ const OrderEnum = z.enum(['asc', 'desc']);
 
 export const createOrderSchema = z.object({
     products: z.array(z.object({
-        product_id: z.uuid(),
+        product_id: z.string().uuid(),
+        listing_id: z.string().uuid().nullable().optional(),
         quantity: z.number().int().min(1),
     })),
     payment_method: PaymentMethodEnum,
-    address: z.string()
+    address: z.string(),
+    referral_code: z.string().nullable().optional()
 });
 
 export const getOrderSchema = z.object({

@@ -14,13 +14,16 @@ import {
 import { Optional } from "sequelize";
 import Order from "./order.model";
 import Inventory from "./inventory.model";
+import Listing from "./listing.model";
 
 interface OrderItemAttributes {
   id: string;
   order_id?: string;
   product_id?: string;
+  listing_id?: string | null;
   quantity: number;
   price: number;
+  unit_price: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -66,6 +69,15 @@ export default class OrderItem extends Model<OrderItemAttributes, OrderItemCreat
   @BelongsTo(() => Inventory)
   product?: Inventory;
 
+  @ForeignKey(() => Listing)
+  @Column({
+    type: DataType.UUID,
+  })
+  listing_id?: string;
+
+  @BelongsTo(() => Listing)
+  listing?: Listing;
+
   @AllowNull(false)
   @Column({
     type: DataType.INTEGER,
@@ -80,6 +92,12 @@ export default class OrderItem extends Model<OrderItemAttributes, OrderItemCreat
     type: DataType.DECIMAL(10, 2),
   })
   price!: number;
+
+  @AllowNull(false)
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+  })
+  unit_price!: number;
 
   @CreatedAt
   @Column({

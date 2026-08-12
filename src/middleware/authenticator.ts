@@ -31,3 +31,30 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         next(err);
     }
 }
+
+export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const sessionId = req.cookies?.session_id;
+        if (!sessionId) {
+            return next();
+        }
+
+        const session = await authService.validateSession(sessionId);
+        if (session.ttl < SESSION_THRESHOLD) {
+            const newLastActive = new Date();
+            await authService.updateSession(sessionId, session.user_id, newLastActive);
+            session.last_active = newLastActive;
+            setSessionCookie(res, sessionId);
+        }
+
+        req.user = { id: session.user_id, role: session.role as Role };
+        req.session = {
+            id: sessionId,
+            last_active: session.last_active,
+        }
+
+        next();
+    } catch (err) {
+        next();
+    }
+}

@@ -12,6 +12,7 @@ export type OrderBase = {
     payment_method: PaymentMethod,
     total_amount: number,
     address: string,
+    referral_code?: string | null,
     created_at: Date,
     updated_at: Date,
     estimated_delivery?: Date

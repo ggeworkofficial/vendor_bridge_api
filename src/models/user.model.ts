@@ -26,6 +26,7 @@ interface UserAttributes {
   password: string;
   role: string;
   status: string;
+  ref_code: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -33,7 +34,7 @@ interface UserAttributes {
 interface UserCreationAttributes
   extends Optional<
     UserAttributes,
-     "role" | "status" | "created_at" | "updated_at"
+     "role" | "status" | "created_at" | "updated_at" | "ref_code"
   > {}
 
 @Table({
@@ -89,6 +90,13 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
     },
   })
   status!: string;
+
+  @AllowNull(false)
+  @Unique
+  @Column({
+    type: DataType.STRING(16),
+  })
+  ref_code!: string;
 
   @CreatedAt
   @Column({
