@@ -4,6 +4,8 @@
 
 VendorBridge API: an Express 5 + TypeScript (CommonJS) e-commerce REST API. Buyers shop and order; sellers list inventory; a reseller program exists (applications, shares, clicks, payouts) with services/repositories/models in place but **no routes/controllers yet**. Admins manage users, categories, sellers, inventory, orders, receipts, complaints, logistics, payment accounts, and settings.
 
+A newer "unified marketplace" layer exists on top of the inventory flow: `listings` (kind `product | service | skill`, moderation status, bulk-pricing tiers via `listing_price_tiers`, per-listing commission settings), seller `follows`, referral commissions (`referrals` + wallet endpoints), and `withdrawals` with an admin approval flow. **These features were merged with controllers that query Sequelize models directly (no service/repository/validator layers) — this deviates from the project's layered architecture and is flagged as a known architectural problem; do not copy that pattern for new work** (see "Architecture decisions to preserve").
+
   
 
 ## Stack
@@ -16,9 +18,11 @@ VendorBridge API: an Express 5 + TypeScript (CommonJS) e-commerce REST API. Buye
 
 - **Cache/sessions**: `ioredis` (auth sessions + product listing cache).
 
-- **Validation**: zod `^4` (v4 API — `z.email()`, not `z.string().email()`). `joi` is a dependency but only mis-imported as a type in `src/repositories/reseller.repository.ts`; do not use it for new validation.
+- **Validation**: zod `^4` (v4 API — `z.email()`, not `z.string().email()`). `joi`/`@types/joi` remain in `package.json` but are no longer imported anywhere in `src/`; do not use them for new validation.
 
 - **Auth**: session-based (Redis), not JWT. Password hashing via `bcryptjs`.
+
+- **Scheduled jobs**: `node-cron`, initialized once at startup via `initCronJobs()` in `src/app.ts` (implementation in `src/service/cron.service.ts`; currently clears pending referrals after the 7-day return window).
 
 - **Uploads**: `multer` (images only, 5MB cap) → `uploads/`.
 
@@ -48,7 +52,7 @@ VendorBridge API: an Express 5 + TypeScript (CommonJS) e-commerce REST API. Buye
 
 - `.env` and `config/` are gitignored but required. Run `npm run setup` first, then fill `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD`, `REDIS_URL`, `PORT`.
 
-- CORS origin hardcoded to `http://localhost:5173` in `src/app.ts:47`.
+- CORS allows multiple hardcoded origins in `src/app.ts` (currently `http://localhost:5173`, `http://localhost:8080`, `http://127.0.0.1:8080`).
 
 - Sessions: Redis keyed by `session_id` cookie (httpOnly, 7-day TTL, refreshed when < 3 days left). `session_id` returned by login but never exposed in JSON responses (controllers strip it).
 
@@ -88,7 +92,9 @@ Layered, single-responsibility per directory. Route wiring order: `authenticate`
 
   
 
-- `authenticate` (`src/middleware/authenticator.ts`) validates the Redis session and sets `req.user = { id, role }`. **`role` comes from the session captured at login; it is NOT re-read from the DB per request.**
+- `authenticate` (`src/middleware/authenticator.ts`) validates the Redis session and sets `req.user = { id, role }` plus `req.session = { id, last_active }`. **`role` comes from the session captured at login; it is NOT re-read from the DB per request.**
+
+- `optionalAuthenticate` (same file) is a soft variant used on public endpoints (`listings`, `follows` state): it attaches `req.user` when a valid session cookie exists and silently continues (`next()`) when there is no session or validation fails.
 
 - RBAC tables/models (`roles`, `permissions`, `user_roles`, `role_permissions`, migration `20260810000000-create-rbac-tables.js`) exist but are **not wired into runtime authorization**. `checkRole` (`src/middleware/roleChecker.ts`) still uses hardcoded roles `admin | buyer | contributor`, and the `Role` type omits `seller`, `reseller`, `service_provider`, `bulk_buyer` even though `user.model.ts` accepts them. Changing this is a deliberate migration, not a quick edit.
 
@@ -128,7 +134,7 @@ Layered, single-responsibility per directory. Route wiring order: `authenticate`
 
   
 
-- Files: `<resource>.model.ts`, `.repository.ts`, `.service.ts`, `.controller.ts`, `.validator.ts`, `.routes.ts`. Note typos that are deliberate-to-keep for now: `src/types/pageination.ts` (the `PaginationResponse` type, NOT "pagination") and the mis-import `WhereOptions` from `joi` (as `WhenOptions`) in `reseller.repository.ts` — don't "fix" either without a broader cleanup.
+- Files: `<resource>.model.ts`, `.repository.ts`, `.service.ts`, `.controller.ts`, `.validator.ts`, `.routes.ts`. Note typos that are deliberate-to-keep for now: `src/types/pageination.ts` (the `PaginationResponse` type, NOT "pagination") — don't "fix" it without a broader cleanup. (The former `WhenOptions` mis-import from `joi` in `reseller.repository.ts` was fixed in commit `98cc94f`.)
 
 - Controllers read `req.params.id` / `req.body` raw. Validated data lives on `(req as any).validated` and is NOT merged back into `req.body`/`req.params`.
 
@@ -140,7 +146,7 @@ Layered, single-responsibility per directory. Route wiring order: `authenticate`
 
   
 
-- Strict layering: DB access lives only in `repositories/`; controllers stay thin; business logic in `service/`.
+- Strict layering: DB access lives only in `repositories/`; controllers stay thin; business logic in `service/`. **Known violation (merged code, do not replicate):** the unified-marketplace controllers (`listing`, `follow`, `referral`, `withdrawal`) and `src/service/cron.service.ts` query Sequelize models directly, and their routes ship no zod validators. Treat these as legacy debt to be refactored into the layered pattern, not as a template.
 
 - Session-based auth with role captured at login; ownership checks via `checkOwnershipOrAdmin`.
 
@@ -148,7 +154,7 @@ Layered, single-responsibility per directory. Route wiring order: `authenticate`
 
 - Hand-maintained API docs (`vendor-bridge-apis.md` at root, `docs/vendorbridge_api.yaml`) drift from code — trust the code, not the docs.
 
-- CORS origin hardcoded in `app.ts` (flag the change if you must alter it).
+- CORS origins hardcoded in `app.ts` (flag the change if you must alter it).
 
   
 
