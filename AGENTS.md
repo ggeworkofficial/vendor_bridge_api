@@ -4,7 +4,7 @@
 
 VendorBridge API: an Express 5 + TypeScript (CommonJS) e-commerce REST API. Buyers shop and order; sellers list inventory; a reseller program exists (applications, shares, clicks, payouts) with services/repositories/models in place but **no routes/controllers yet**. Admins manage users, categories, sellers, inventory, orders, receipts, complaints, logistics, payment accounts, and settings.
 
-A newer "unified marketplace" layer exists on top of the inventory flow: `listings` (kind `product | service | skill`, moderation status, bulk-pricing tiers via `listing_price_tiers`, per-listing commission settings), seller `follows`, referral commissions (`referrals` + wallet endpoints), and `withdrawals` with an admin approval flow. **These features were merged with controllers that query Sequelize models directly (no service/repository/validator layers) — this deviates from the project's layered architecture and is flagged as a known architectural problem; do not copy that pattern for new work** (see "Architecture decisions to preserve").
+A newer "unified marketplace" layer exists on top of the inventory flow: `listings` (kind `product | service | skill`, moderation status, bulk-pricing tiers via `listing_price_tiers`, per-listing commission settings), seller `follows`, referral commissions (`referrals` + wallet endpoints), and `withdrawals` with an admin approval flow. These endpoints were originally merged with controllers that queried Sequelize models directly; they were refactored into the standard layered pattern (services + repositories) on 2026-08-22. **Remaining known violations: `src/service/cron.service.ts` and parts of `src/service/order.service.ts` still query Sequelize models directly, and marketplace routes ship no zod validators (adding validators would change validation responses and was deferred) — do not copy that pattern for new work** (see "Architecture decisions to preserve").
 
   
 
@@ -146,7 +146,7 @@ Layered, single-responsibility per directory. Route wiring order: `authenticate`
 
   
 
-- Strict layering: DB access lives only in `repositories/`; controllers stay thin; business logic in `service/`. **Known violation (merged code, do not replicate):** the unified-marketplace controllers (`listing`, `follow`, `referral`, `withdrawal`) and `src/service/cron.service.ts` query Sequelize models directly, and their routes ship no zod validators. Treat these as legacy debt to be refactored into the layered pattern, not as a template.
+- Strict layering: DB access lives only in `repositories/`; controllers stay thin; business logic in `service/`. **Known remaining violations (merged code, do not replicate):** `src/service/cron.service.ts` and parts of `src/service/order.service.ts` query Sequelize models directly, and the marketplace routes ship no zod validators. Treat these as legacy debt to be refactored into the layered pattern, not as a template.
 
 - Session-based auth with role captured at login; ownership checks via `checkOwnershipOrAdmin`.
 

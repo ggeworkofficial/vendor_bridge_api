@@ -2,18 +2,23 @@
 
 Concise development log. Update after substantial implementation work. Not a duplicate of AGENTS.md (stable conventions live there).
 
-## Current state (2026-08-21)
+## Current state (2026-08-22)
 
-- Branch: `NewFeatures` (HEAD `db3cb45`). This branch merges another developer's "unified marketplace" work (referral system, bulk pricing, follows, withdrawals, cron jobs) on top of the RBAC groundwork.
+- Branch: `NewFeatures`. Unified-marketplace endpoints have been refactored into the layered architecture (controllers → services → repositories); `npm run build` passes after the refactor.
 - RBAC groundwork landed: `roles`, `permissions`, `user_roles`, `role_permissions` tables + models + seed data (migration `20260810000000-create-rbac-tables.js`, commit `36763bc`). System roles seeded: `admin`, `buyer`, `contributor`, `reseller`.
 - **Still not wired into runtime**: `checkRole` middleware still uses hardcoded roles (`admin | buyer | contributor`); `req.user.role` still comes from the Redis session captured at login. Next planned step: make authorization read from the new RBAC tables.
 - Permission lookup repository implemented: `hasPermission(userId, permission): Promise<boolean>` in `src/repositories/rbac.repository.ts`. Uses ORM associations `UserRole`→`Role` (`role`)→`RolePermission` (`rolePermissions`)→`Permission` (`permission`) with `required: true` inner joins and a `where { name }` filter; returns `rows.length > 0`. No raw SQL, no schema changes.
-- **Architectural problem (merged code)**: the new marketplace controllers (`listing.controller.ts`, `follow.controller.ts`, `referral.controller.ts`, `withdrawal.controller.ts`) and `src/service/cron.service.ts` query Sequelize models directly — no service/repository layers and no zod validators for their routes. This violates the project's layered architecture and is flagged as legacy debt to refactor (see Known issues).
-- `npm run build` (tsc) passes on HEAD (re-verified 2026-08-21).
+- **Remaining layering violations**: `src/service/cron.service.ts` and parts of `src/service/order.service.ts` still query Sequelize models directly (see Known issues).
+- `npm run build` (tsc) passes (re-verified 2026-08-22 after the marketplace layering refactor).
 - No tests exist (`npm test` is a stub, `src/test/` empty).
 
 ## Completed
 
+- **Unified-marketplace layering refactor (2026-08-22)**: moved `listing`, `follow`, `referral`, `withdrawal` endpoints into the canonical layered pattern with zero route/schema/response-shape changes:
+  - New repositories (only layer touching Sequelize models): `listing.repository.ts`, `follow.repository.ts`, `referral.repository.ts`, `withdrawal.repository.ts` — all queries/includes/pagination/order moved verbatim from the old controllers; transactions passed into repository methods where writes occur.
+  - New services: `listing.service.ts` (visibility rules, ownership/banned checks, admin status filter, moderation action→status map, inventory sync decision, tags/tiers parsing), `follow.service.ts` (self-follow rule, seller existence), `referral.service.ts` (wallet math, buyer masking, click-tracking stub log), `withdrawal.service.ts` (amount validation, one-pending rule, balance computation, pending-only processing).
+  - Controllers rewritten as thin HTTP glue (class API and method names unchanged, so route files are untouched). Business-rule failures now throw `createError(message, status)` with the exact same status/message as before → `errorHandler` emits the same `{ success: false, message }` body. Transaction create/commit/rollback orchestrated in controllers for `createListing`/`updateListing`/`moderateListing`/`requestWithdrawal` (same pattern as receipt/order/inventory controllers).
+  - Behavior deltas (intentional, documented): unexpected exceptions now flow through `next(error)` → `errorHandler`, so 500 bodies use the project-wide `{ success: false, message }` shape instead of the ad-hoc per-endpoint message + `errors` array. Also fixed incidentally: the old code leaked open transactions on early-return business failures in `updateListing`/`moderateListing`; the refactored controllers always roll back.
 - RBAC permission repository: `hasPermission(userId, permission)` in `src/repositories/rbac.repository.ts` (ORM-association lookup, returns real boolean).
 - RBAC schema/models/seed migration (`36763bc`).
 - Reseller domain (services/repositories/models/validators for applications, shares, clicks, payouts) — **no routes/controllers yet** (`adcdd53`).
@@ -36,22 +41,23 @@ Concise development log. Update after substantial implementation work. Not a dup
 - `uploads/` files are committed to git.
 - Docs (`vendor-bridge-apis.md`, `docs/vendorbridge_api.yaml`) drift from code.
 - `Role` type (`roleChecker.ts`) omits `seller`, `reseller`, `service_provider`, `bulk_buyer` that `user.model.ts` accepts.
-- **Architectural problem**: marketplace controllers (`listing`, `follow`, `referral`, `withdrawal`) and `cron.service.ts` bypass the service/repository layers and query Sequelize models directly; their routes have no zod validators. Needs refactoring into the layered pattern (routes → validators → controllers → services → repositories).
-- Referral click tracking (`POST /api/referrals/track`) is a stub — it only logs and persists nothing (the `reseller_clicks` table/model from the reseller domain is unused by it).
+- **Remaining layering violations**: `src/service/cron.service.ts` (referral clearing job) and parts of `src/service/order.service.ts` (bulk pricing/referral creation) still query Sequelize models directly instead of going through repositories. The four marketplace controllers were refactored (2026-08-22); these two services remain as legacy debt. Marketplace routes still have no zod validators (adding them would change validation responses; left out to preserve behavior).
+- Referral click tracking (`POST /api/referrals/track`) is a stub — it only logs (now via `ReferralService.trackClick`) and persists nothing (the `reseller_clicks` table/model from the reseller domain is unused by it).
 - `src/types/pageination.ts` is a typo. Kept intentionally. (The former `WhenOptions` mis-import from `joi` was fixed in `98cc94f`.)
 
 ## Remaining / next
 
 - Wire RBAC into runtime authorization (permission checks, role from `user_roles`, session refresh on role change).
 - Add reseller routes/controllers.
-- Refactor the unified-marketplace endpoints (listings, follows, referrals, withdrawals) into the layered architecture: zod validators + services + repositories, moving DB access out of the controllers and `cron.service.ts`.
+- Move remaining direct model queries into repositories: `cron.service.ts` and `order.service.ts`.
 - Implement real referral click tracking (persist clicks instead of logging).
 - Add tests (none exist).
 
 ## Verification
 
 - `npm run build` passes after changes; run it before declaring work complete.
-- `npm run build` re-verified on `NewFeatures` HEAD (`db3cb45`, 2026-08-21) after the marketplace merge — tsc clean.
+- `npm run build` re-verified 2026-08-22 after the marketplace layering refactor — tsc clean.
+- Layering verified by inspection: the four refactored controllers import only `express`, their service, and (where transactions apply) `connection/postgres`; no Sequelize model imports or query calls remain in them.
 - `hasPermission` runtime checks against dev DB (2026-08-10, all PASS, temp rows cleaned up):
   - buyer user with `product.get_all` → `true`
   - same user with `user.delete` (admin-only) → `false`
